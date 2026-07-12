@@ -1,0 +1,92 @@
+version: '3.8'
+
+services:
+  config-server:
+    build: ./config-server
+    container_name: config-server
+    ports:
+      - "8888:8888"
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:8888"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+    networks:
+      - microservicios-proyecto_default
+
+  eureka-server:
+    build: ./eureka-server
+    container_name: eureka-server
+    ports:
+      - "8761:8761"
+    depends_on:
+      config-server:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:8761/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+    networks:
+      - microservicios-proyecto_default
+
+  ms-gateway:
+    build: ./ms-gateway
+    container_name: ms-gateway
+    ports:
+      - "8080:8080"
+    depends_on:
+      eureka-server:
+        condition: service_healthy
+    networks:
+      - microservicios-proyecto_default
+
+  ms-ordenes:
+    build: ./ms-ordenes
+    container_name: ms-ordenes
+    ports:
+      - "8082:8082"
+    depends_on:
+      eureka-server:
+        condition: service_healthy
+    networks:
+      - microservicios-proyecto_default
+
+  ms-requerimiento:
+    build: ./ms-requerimiento
+    container_name: ms-requerimiento
+    ports:
+      - "8083:8083"
+    depends_on:
+      eureka-server:
+        condition: service_healthy
+    networks:
+      - microservicios-proyecto_default
+
+  ms-pedidodependencia:
+    build: ./ms-pedidodependencia
+    container_name: ms-pedidodependencia
+    ports:
+      - "8084:8084"
+    depends_on:
+      eureka-server:
+        condition: service_healthy
+    networks:
+      - microservicios-proyecto_default
+
+  ms-recepcion:
+    build: ./ms-recepcion
+    container_name: ms-recepcion
+    ports:
+      - "8085:8085"
+    depends_on:
+      eureka-server:
+        condition: service_healthy
+    networks:
+      - microservicios-proyecto_default
+
+networks:
+  microservicios-proyecto_default:
+    external: true
