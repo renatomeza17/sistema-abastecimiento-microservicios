@@ -1,13 +1,13 @@
 server:
   port: 8888
+
 spring:
   application:
     name: config-server
   profiles:
-    active: native #Indica que use archivos locales
+    active: native
   cloud:
     config:
       server:
         native:
-        # Aquí buscará los archivos compartidos. Puedes crear una carpeta llamada 'config-repo'
-          search-locations: classpath:/configurations
+          search-locations: classpath:/configuraciones/

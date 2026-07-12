@@ -1,25 +1,5 @@
-server:
-  port: 8084
-
 spring:
   application:
     name: ms-recepcion
   config:
-    import: 'optional:configserver:http://localhost:8888'
-  datasource:
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://[TU_ENLACE_DE_AIVEN_O_MYSQL]:3306/db_recepcion
-    username: tu_usuario
-    password: tu_password
-  jpa:
-    hibernate:
-      database-platform: org.hibernate.dialect.MySQLDialect
-
-springdoc:
-  swagger-ui:
-    path: /docs
-
-eureka:
-  client:
-    service-url:
-      defaultZone: http://localhost:8761/eureka/
+    import: ${SPRING_CONFIG_IMPORT:optional:configserver:http://localhost:8888}

@@ -4,7 +4,7 @@ spring:
   application:
     name: eureka-server
   config:
-    import: 'optional:configserver:http://localhost:8888'
+    import: ${SPRING_CONFIG_IMPORT:optional:configserver:http://localhost:8888}
 eureka:
   instance:
     hostname: localhost
