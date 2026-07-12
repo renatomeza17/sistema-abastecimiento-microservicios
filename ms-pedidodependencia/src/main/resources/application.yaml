@@ -1,3 +1,27 @@
+server:
+  port: 8086
+
 spring:
   application:
-    name: ms-pedidodependencia
+    name: ms-pedidos
+  config:
+    import: 'optional:configserver:http://localhost:8888'
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://[URL_DE_NEON_AQUI]/db_pedidos?sslmode=require
+    username: [USUARIO_NEON]
+    password: [PASSWORD_NEON]
+  jpa:
+    hibernate:
+      database-platform: org.hibernate.dialect.PostgreSQLDialect
+
+springdoc:
+  swagger-ui:
+    path: /docs
+
+eureka:
+  instance:
+    hostname: localhost
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/

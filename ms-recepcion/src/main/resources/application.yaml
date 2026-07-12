@@ -1,5 +1,5 @@
 server:
-  port: 8081
+  port: 8084
 
 spring:
   application:
@@ -7,21 +7,19 @@ spring:
   config:
     import: 'optional:configserver:http://localhost:8888'
   datasource:
-    driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://[URL_DE_NEON_AQUI]/db_recepcion?sslmode=require
-    username: [USUARIO_NEON]
-    password: [PASSWORD_NEON]
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://[TU_ENLACE_DE_AIVEN_O_MYSQL]:3306/db_recepcion
+    username: tu_usuario
+    password: tu_password
   jpa:
     hibernate:
-      database-platform: org.hibernate.dialect.PostgreSQLDialect
+      database-platform: org.hibernate.dialect.MySQLDialect
 
 springdoc:
   swagger-ui:
     path: /docs
 
 eureka:
-  instance:
-    hostname: localhost
   client:
     service-url:
       defaultZone: http://localhost:8761/eureka/
