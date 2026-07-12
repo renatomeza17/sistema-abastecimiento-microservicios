@@ -76,16 +76,45 @@ services:
     networks:
       - microservicios-proyecto_default
 
+  postgres-recepcion:
+    image: postgres:16-alpine
+    container_name: postgres-recepcion
+    environment:
+      POSTGRES_DB: recepcionDb
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./db/Recepcion:/docker-entrypoint-initdb.d
+      - postgres-recepcion-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - microservicios-proyecto_default
+
   ms-recepcion:
     build: ./ms-recepcion
     container_name: ms-recepcion
     ports:
       - "8085:8085"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-recepcion:5432/recepcionDb
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
     depends_on:
       eureka-server:
         condition: service_healthy
+      postgres-recepcion:
+        condition: service_healthy
     networks:
       - microservicios-proyecto_default
+
+volumes:
+  postgres-recepcion-data:
 
 networks:
   microservicios-proyecto_default:
