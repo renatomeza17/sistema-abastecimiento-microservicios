@@ -6,15 +6,9 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.springframework.context.annotation.Configuration;
-
-import jakarta.annotation.PostConstruct;
-
-@Configuration
 public class EnvLoader {
 
-    @PostConstruct
-    public void loadEnv() {
+    public static void load() {
         try (BufferedReader reader = new BufferedReader(new FileReader(".env"))) {
             Map<String, String> envMap = new HashMap<>();
             String line;
