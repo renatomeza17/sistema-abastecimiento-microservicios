@@ -8,12 +8,15 @@ spring:
     import: ${SPRING_CONFIG_IMPORT:optional:configserver:http://localhost:8888}
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://[TU_ENLACE_DE_AIVEN_O_MYSQL]:3306/db_ordenes
-    username: tu_usuario
-    password: tu_password
+    url: ${ORDENES_DB_URL}
+    username: ${ORDENES_DB_USERNAME}
+    password: ${ORDENES_DB_PASSWORD}
   jpa:
+    database-platform: org.hibernate.dialect.MySQLDialect
+    show-sql: true
     hibernate:
-      database-platform: org.hibernate.dialect.MySQLDialect
+      ddl-auto: update
+      
 
 springdoc:
   swagger-ui:
