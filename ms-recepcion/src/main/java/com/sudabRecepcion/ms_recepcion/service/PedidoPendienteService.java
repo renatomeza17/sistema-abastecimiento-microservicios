@@ -5,10 +5,13 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
+import com.sudabRecepcion.ms_recepcion.client.OrdenFeignClient;
+import com.sudabRecepcion.ms_recepcion.dto.OrdenResponseDTO;
 import com.sudabRecepcion.ms_recepcion.http.response.PedidoPendienteResponseDTO;
 import com.sudabRecepcion.ms_recepcion.model.PedidoPendiente;
 import com.sudabRecepcion.ms_recepcion.repository.PedidoPendienteRepository;
 
+import feign.FeignException;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -16,8 +19,22 @@ import lombok.RequiredArgsConstructor;
 public class PedidoPendienteService {
 
     private final PedidoPendienteRepository pedidoPendienteRepository;
+    private final OrdenFeignClient ordenFeignClient;
 
     public PedidoPendienteResponseDTO registrar(Long idOrden, String motivo) {
+        OrdenResponseDTO orden;
+        try {
+            orden = ordenFeignClient.obtenerOrden(idOrden);
+        } catch (FeignException.NotFound e) {
+            throw new IllegalArgumentException("La orden con id " + idOrden + " no existe en ms-ordenes.");
+        } catch (FeignException e) {
+            throw new IllegalStateException("No se pudo verificar la orden en ms-ordenes. Intenta más tarde.");
+        }
+
+        if (orden == null) {
+            throw new IllegalArgumentException("La orden con id " + idOrden + " no existe en ms-ordenes.");
+        }
+
         PedidoPendiente pedido = new PedidoPendiente();
         pedido.setIdOrden(idOrden);
         pedido.setMotivo(motivo);
