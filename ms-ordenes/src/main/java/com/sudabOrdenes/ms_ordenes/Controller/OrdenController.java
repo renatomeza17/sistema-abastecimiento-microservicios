@@ -110,18 +110,7 @@ public class OrdenController {
         return ResponseEntity.ok(ordenService.recepcionarOrden(id));
     }
 
-    @PutMapping("/{id}/pedido-pendiente")
-    public ResponseEntity<OrdenResponseDTO> registrarPedidoPendiente(
-            @PathVariable Long id,
-            @RequestParam String motivo
-    ) {
-        return ResponseEntity.ok(ordenService.registrarPedidoPendiente(id, motivo));
-    }
-
-    @GetMapping("/recepcion/pendientes")
-    public ResponseEntity<List<OrdenResponseDTO>> listarPedidosPendientes() {
-        return ResponseEntity.ok(ordenService.listarPedidosPendientes());
-    }
+  
 
 
 
