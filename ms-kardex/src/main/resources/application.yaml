@@ -1,5 +1,5 @@
 server:
-  port: 8085
+  port: 8087
 
 spring:
   application:
@@ -8,12 +8,13 @@ spring:
     import: ${SPRING_CONFIG_IMPORT:optional:configserver:http://localhost:8888}
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://[TU_ENLACE_DE_AIVEN_O_MYSQL]:3306/db_kardex
-    username: tu_usuario
-    password: tu_password
+    url: ${SPRING_DATASOURCE_URL}
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
   jpa:
     hibernate:
       database-platform: org.hibernate.dialect.MySQLDialect
+      ddl-auto: update
 
 springdoc:
   swagger-ui:
