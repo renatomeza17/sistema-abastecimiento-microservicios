@@ -1,0 +1,25 @@
+server:
+  port: 8085
+
+spring:
+  application:
+    name: ms-kardex
+  config:
+    import: ${SPRING_CONFIG_IMPORT:optional:configserver:http://localhost:8888}
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://[TU_ENLACE_DE_AIVEN_O_MYSQL]:3306/db_kardex
+    username: tu_usuario
+    password: tu_password
+  jpa:
+    hibernate:
+      database-platform: org.hibernate.dialect.MySQLDialect
+
+springdoc:
+  swagger-ui:
+    path: /docs
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/

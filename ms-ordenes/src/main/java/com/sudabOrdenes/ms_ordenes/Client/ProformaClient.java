@@ -7,11 +7,12 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.sudabOrdenes.ms_ordenes.Config.FeignClientConfig;
 import com.sudabOrdenes.ms_ordenes.DTO.proforma.ProformaResponseDTO;
 
 
 
-@FeignClient(name = "ms-proformas")
+@FeignClient(name = "ms-proformas",configuration = FeignClientConfig.class)
 public interface ProformaClient {
     // @GetMapping("/{id}")
     // ProformaResponseDTO obtenerProforma(@PathVariable Long id);

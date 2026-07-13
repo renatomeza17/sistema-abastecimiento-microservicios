@@ -48,6 +48,8 @@
     <module>ms-pedidodependencia</module>
     <module>ms-ordenes</module>
     <module>ms-recepcion</module>
+    <module>ms-kardex</module>
     <module>ms-gateway</module>
+  
   </modules>
 </project>
