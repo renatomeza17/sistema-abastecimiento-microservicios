@@ -31,13 +31,19 @@ spring:
               predicates:
                 - Path=/recepcion/**
               filters:
-                - RewritePath=/recepcion/(?<segment>.*), /api/recepcion/${segment}
+                - RewritePath=/recepcion/(?<segment>.*), /api/pedidos-pendientes/${segment}
             - id: pedidodependencia
               uri: lb://MS-PEDIDODEPENDENCIA
               predicates:
                 - Path=/pedidodependencia/**
               filters:
                 - RewritePath=/pedidodependencia/(?<segment>.*), /api/pedidodependencia/${segment}
+            - id: login
+              uri: lb://MS-LOGIN
+              predicates:
+                - Path=/login/**
+              filters:
+                - RewritePath=/login/(?<segment>.*), /api/login/${segment}
 
 eureka:
   instance:
