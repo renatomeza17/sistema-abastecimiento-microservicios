@@ -39,31 +39,47 @@ spring:
               filters:
                 - RewritePath=/pedidodependencia/(?<segment>.*), /api/pedidodependencia/${segment}
             - id: login
-              uri: lb://MS-LOGIN
+              uri: https://ms-login-9l2y.onrender.com
               predicates:
                 - Path=/login/**
               filters:
                 - RewritePath=/login/(?<segment>.*), /api/login/${segment}
             - id: roles
+<<<<<<< HEAD
               uri: lb://MS-LOGIN
+=======
+              uri: https://ms-login-9l2y.onrender.com
+>>>>>>> 5103f63 (fix: rutas de roles y usuarios en gateway apuntando directo a ms-login)
               predicates:
                 - Path=/roles/**
               filters:
                 - RewritePath=/roles/(?<segment>.*), /api/roles/${segment}
             - id: roles-base
+<<<<<<< HEAD
               uri: lb://MS-LOGIN
+=======
+              uri: https://ms-login-9l2y.onrender.com
+>>>>>>> 5103f63 (fix: rutas de roles y usuarios en gateway apuntando directo a ms-login)
               predicates:
                 - Path=/roles
               filters:
                 - RewritePath=/roles, /api/roles
             - id: usuarios
+<<<<<<< HEAD
               uri: lb://MS-LOGIN
+=======
+              uri: https://ms-login-9l2y.onrender.com
+>>>>>>> 5103f63 (fix: rutas de roles y usuarios en gateway apuntando directo a ms-login)
               predicates:
                 - Path=/usuarios/**
               filters:
                 - RewritePath=/usuarios/(?<segment>.*), /api/usuarios/${segment}
             - id: usuarios-base
+<<<<<<< HEAD
               uri: lb://MS-LOGIN
+=======
+              uri: https://ms-login-9l2y.onrender.com
+>>>>>>> 5103f63 (fix: rutas de roles y usuarios en gateway apuntando directo a ms-login)
               predicates:
                 - Path=/usuarios
               filters:
