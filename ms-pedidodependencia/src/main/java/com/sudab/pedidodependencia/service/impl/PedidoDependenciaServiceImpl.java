@@ -1,5 +1,7 @@
 package com.sudab.pedidodependencia.service.impl;
 
+import com.sudab.pedidodependencia.client.ProductoClient;
+import com.sudab.pedidodependencia.client.UsuarioClient;
 import com.sudab.pedidodependencia.dto.request.PedidoDependenciaRequestDTO;
 import com.sudab.pedidodependencia.dto.response.PedidoDependenciaResponseDTO;
 import com.sudab.pedidodependencia.exception.BusinessException;
@@ -12,6 +14,7 @@ import com.sudab.pedidodependencia.repository.DependenciaRepository;
 import com.sudab.pedidodependencia.repository.PedidoDependenciaRepository;
 import com.sudab.pedidodependencia.service.CodigoGeneratorService;
 import com.sudab.pedidodependencia.service.PedidoDependenciaService;
+import feign.FeignException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,12 +31,28 @@ public class PedidoDependenciaServiceImpl implements PedidoDependenciaService {
     private final DependenciaRepository dependenciaRepository;
     private final PedidoDependenciaMapper pedidoDependenciaMapper;
     private final CodigoGeneratorService codigoGeneratorService;
+    private final UsuarioClient usuarioClient;
+    private final ProductoClient productoClient;
 
     @Override
     public PedidoDependenciaResponseDTO crear(PedidoDependenciaRequestDTO dto) {
         Dependencia dependencia = dependenciaRepository.findById(dto.idDependencia())
                 .orElseThrow(() -> new ResourceNotFoundException(
                         "Dependencia no encontrada con id: " + dto.idDependencia()));
+
+        try {
+            usuarioClient.obtenerUsuarioPorId(dto.idUsuario());
+        } catch (FeignException e) {
+            throw new ResourceNotFoundException("Usuario no encontrado con id: " + dto.idUsuario());
+        }
+
+        for (var detalle : dto.detalles()) {
+            try {
+                productoClient.obtenerProductoPorId(detalle.idProducto());
+            } catch (FeignException e) {
+                throw new ResourceNotFoundException("Producto no encontrado con id: " + detalle.idProducto());
+            }
+        }
 
         PedidoDependencia pedido = pedidoDependenciaMapper.toEntity(dto, dependencia);
         pedido.setCodigo(codigoGeneratorService.generarCodigo("PED"));
