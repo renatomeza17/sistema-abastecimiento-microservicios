@@ -37,9 +37,8 @@ public class AuthService {
 
         String token = jwtUtil.generarToken(usuario.getUsername(), nombresRoles);
 
-        String nombreCompleto = usuario.getPersona() != null
-                ? usuario.getPersona().getNombres() + " " + usuario.getPersona().getApellidoPaterno()
-                : usuario.getUsername();
+        // Los datos de persona ahora viven directamente en Usuario (ya no hay entidad Persona separada)
+        String nombreCompleto = usuario.getNombres() + " " + usuario.getApellidoPaterno();
 
         return new LoginResponseDTO(token, usuario.getUsername(), nombreCompleto, nombresRoles);
     }
