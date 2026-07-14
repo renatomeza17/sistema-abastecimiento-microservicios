@@ -7,6 +7,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.Data;
 
@@ -20,8 +22,12 @@ public class Kardex {
     @GeneratedValue(strategy=GenerationType.IDENTITY)
     private Long idKardex;
 
-    @Column(name = "id_producto", unique = true, nullable = false)
-    private Long idProducto;
+    // @Column(name = "id_producto", unique = true, nullable = false)
+    // private Long idProducto;
+
+    @OneToOne
+    @JoinColumn(name = "id_producto", unique = true, nullable = false)
+    private Producto producto;
 
     @Column
     private Integer stockActual;

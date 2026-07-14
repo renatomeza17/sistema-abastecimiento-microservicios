@@ -52,7 +52,7 @@ public class KardexService {
 
             // Crear cabecera de Kárdex
             Kardex nuevoKardex = new Kardex();
-            nuevoKardex.setIdProducto(prod.getIdProducto());
+            nuevoKardex.setProducto(prod);
             nuevoKardex.setStockActual(0); // Nace en cero hasta que entre una OC conforme
             nuevoKardex.setStockMinimo(dto.getStockMinimo());
             nuevoKardex.setUbicacionAlmacen(dto.getUbicacionAlmacen());
@@ -103,10 +103,10 @@ public class KardexService {
         return kardexRepository.findAll().stream().map(k -> {
             KardexResponseDTO dto = new KardexResponseDTO();
             dto.setIdKardex(k.getIdKardex());
-            dto.setIdProducto(k.getIdProducto());
+            dto.setIdProducto(k.getProducto().getIdProducto());
             
             // 3. SOLUCIÓN AL CONVERTIR A DTO: Jalar datos descriptivos del Producto local
-            productoRepository.findById(k.getIdProducto()).ifPresent(p -> {
+            productoRepository.findById(k.getProducto().getIdProducto()).ifPresent(p -> {
                 dto.setCodigoProducto(p.getCodigo()); 
                 dto.setNombreProducto(p.getNombre());
                 dto.setUnidadMedida(p.getUnidadMedida());
@@ -141,7 +141,7 @@ public class KardexService {
 
     public List<ProductoResponseDTO> obtenerProductosDisponibles() {
         List<Long> idsConKardex = kardexRepository.findAll().stream()
-                .map(Kardex::getIdProducto)
+                .map(kardex -> kardex.getProducto().getIdProducto())
                 .toList();
         
         List<Producto> productosLocales;

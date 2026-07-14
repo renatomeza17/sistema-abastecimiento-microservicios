@@ -1,4 +1,4 @@
--- Limpiar tablas si existen (útil para reiniciar el entorno)
+
 DROP TABLE IF EXISTS public.kardex_movimiento CASCADE;
 DROP TABLE IF EXISTS public.kardex CASCADE;
 DROP TABLE IF EXISTS public.producto CASCADE;
@@ -10,7 +10,7 @@ CREATE TABLE public.producto (
     nombre VARCHAR(255) NOT NULL,
     descripcion VARCHAR(200) NOT NULL,
     unidad_medida VARCHAR(255) NOT NULL,
-    activo BOOLEAN DEFAULT TRUE, -- Atributo clave para tu listarProductosActivos()
+    activo BOOLEAN DEFAULT TRUE,
     CONSTRAINT producto_pkey PRIMARY KEY (id_producto),
     CONSTRAINT uk_producto_codigo UNIQUE (codigo),
     CONSTRAINT uk_producto_nombre UNIQUE (nombre)
