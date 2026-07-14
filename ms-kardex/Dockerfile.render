@@ -1,5 +1,5 @@
 # 1. ETAPA DE CONSTRUCCIÓN: Descarga Maven y compila
-FROM maven:3.8.5-openjdk-17 AS build
+FROM maven:3.9-eclipse-temurin-21 AS build
 WORKDIR /app
 COPY . .
 # Este comando compila tu código y crea el .jar en la carpeta target/
