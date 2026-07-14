@@ -16,5 +16,7 @@ public interface ProductoRepository extends JpaRepository<Producto, Long> {
     // NUEVO: Para listar solo lo disponible para los Jefes de Dependencia
     List<Producto> findByActivoTrue();
 
+    List<Producto> findByIdProductoNotIn(List<Long> idsConKardex);
+
 
 }

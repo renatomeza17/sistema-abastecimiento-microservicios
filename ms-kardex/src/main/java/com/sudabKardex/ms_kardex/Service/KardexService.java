@@ -3,6 +3,7 @@ package com.sudabKardex.ms_kardex.Service;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
@@ -103,9 +104,14 @@ public class KardexService {
             KardexResponseDTO dto = new KardexResponseDTO();
             dto.setIdKardex(k.getIdKardex());
             dto.setIdProducto(k.getIdProducto());
-            // dto.setCodigoProducto(k.getIdCodigo()); // O el campo de código de tu entidad
-            // dto.setNombreProducto(k.getProducto().getNombre());
-            // dto.setUnidadMedida(k.getProducto().getUnidadMedida());
+            
+            // 3. SOLUCIÓN AL CONVERTIR A DTO: Jalar datos descriptivos del Producto local
+            productoRepository.findById(k.getIdProducto()).ifPresent(p -> {
+                dto.setCodigoProducto(p.getCodigo()); 
+                dto.setNombreProducto(p.getNombre());
+                dto.setUnidadMedida(p.getUnidadMedida());
+            });
+
             dto.setStockActual(k.getStockActual());
             dto.setStockMinimo(k.getStockMinimo());
             dto.setUbicacionAlmacen(k.getUbicacionAlmacen());
@@ -133,23 +139,29 @@ public class KardexService {
     }
 
 
-    public List<ProductoResponseDTO> obtenerProductosDisponibles() {
-        return productoClient.obtenerProductosSinKardex();
+    public List<Producto> obtenerProductosDisponibles() {
+        List<Long> idsConKardex = kardexRepository.findAll().stream()
+                .map(Kardex::getIdProducto)
+                .toList();
+        
+        if (idsConKardex.isEmpty()) {
+            return productoRepository.findAll();
+        }
+        return productoRepository.findByIdProductoNotIn(idsConKardex);
     }
 
 
-    public List<ProductoResponseDTO> verificarProductosFaltantesDeOrden(Long idOrden) {
-        // 1. Buscamos de forma segura la Orden de Compra asociada al Pedido Pendiente
+    public List<Producto> verificarProductosFaltantesDeOrden(Long idOrden) {
         OrdenResponseDTO orden = ordenClient.obtenerOrdenPorId(idOrden);
         if (orden == null) {
             throw new EntityNotFoundException("Orden de compra no registrada con el ID: " + idOrden);
         }
 
-        // 2. Extraemos todos los productos mapeados en los detalles de esa Orden
         return orden.getDetalles().stream()
                 .filter(detalle -> !kardexRepository.existsByIdProducto(detalle.getProductoId()))
-                .map(detalle -> productoClient.obtenerProductoPorId(detalle.getProductoId()))
-                .distinct() // Evitamos duplicados si el producto se repitió en las líneas de la orden
+                .map(detalle -> productoRepository.findById(detalle.getProductoId()).orElse(null))
+                .filter(Objects::nonNull)
+                .distinct() 
                 .collect(Collectors.toList());
     }
 
