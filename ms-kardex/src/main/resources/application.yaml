@@ -11,6 +11,13 @@ spring:
     url: ${KARDEX_DB_URL}
     username: ${KARDEX_DB_USERNAME}
     password: ${KARDEX_DB_PASSWORD}
+    hikari:
+      maximum-pool-size: 3
+      minimum-idle: 1
+      idle-timeout: 30000
+      max-lifetime: 270000
+      connection-timeout: 20000
+      
   jpa:
     database-platform: org.hibernate.dialect.MySQLDialect
     show-sql: true
