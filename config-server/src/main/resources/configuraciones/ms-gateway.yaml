@@ -44,6 +44,18 @@ spring:
                 - Path=/login/**
               filters:
                 - RewritePath=/login/(?<segment>.*), /api/login/${segment}
+            - id: roles
+              uri: lb://MS-LOGIN
+              predicates:
+                - Path=/roles/**
+              filters:
+                - RewritePath=/roles/(?<segment>.*), /api/roles/${segment}
+            - id: usuarios
+              uri: lb://MS-LOGIN
+              predicates:
+                - Path=/usuarios/**
+              filters:
+                - RewritePath=/usuarios/(?<segment>.*), /api/usuarios/${segment}
 
 eureka:
   instance:
@@ -52,4 +64,5 @@ eureka:
     register-with-eureka: false
     fetch-registry: true
     serviceUrl:
+      defaultZone: http://eureka-server:8761/eureka
       defaultZone: http://eureka-server:8761/eureka
