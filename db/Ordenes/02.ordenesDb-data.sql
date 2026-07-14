@@ -1,4 +1,4 @@
--- Limpiar tablas para evitar errores de duplicado si se ejecuta de nuevo
+-- Limpia tablas para evitar errores de duplicado si se ejecuta de nuevo
 DELETE FROM orden_compra_detalles;
 DELETE FROM ordenes_compra;
 

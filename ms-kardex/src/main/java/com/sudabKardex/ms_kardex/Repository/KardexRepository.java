@@ -11,7 +11,7 @@ import com.sudabKardex.ms_kardex.Model.Kardex;
 @Repository
 public interface KardexRepository extends JpaRepository<Kardex, Long> {
 
-    Optional<Kardex> findByIdProducto(Long idProducto);
+    Optional<Kardex> findByProducto_IdProducto(Long idProducto);
 
     boolean existsByIdProducto(Long idProducto);
 

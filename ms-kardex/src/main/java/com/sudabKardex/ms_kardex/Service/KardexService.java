@@ -46,7 +46,7 @@ public class KardexService {
                     .orElseThrow(() -> new EntityNotFoundException("Producto no registrado en el catálogo maestro institucional."));
 
             // Validar que no tenga ya un Kárdex abierto
-            if (kardexRepository.findByIdProducto(dto.getIdProducto()).isPresent()) {
+            if (kardexRepository.findByProducto_IdProducto(dto.getIdProducto()).isPresent()) {
                 throw new IllegalStateException("El producto ya cuenta con una ficha de Kárdex activa.");
             }
 
@@ -69,7 +69,7 @@ public class KardexService {
     // --- LOGICA PARA HU10: ACTUALIZACIÓN AUTOMÁTICA (ENTRADAS / SALIDAS) ---
     @Transactional
     public void registrarMovimiento(Long idProducto, Integer cantidad, String tipo, String docReferencia, String obs) {
-        Kardex kardex = kardexRepository.findByIdProducto(idProducto)
+        Kardex kardex = kardexRepository.findByProducto_IdProducto(idProducto)
             .orElseThrow(() -> new EntityNotFoundException("No existe un asiento de Kárdex para este producto. Debe crearlo primero (HU11)."));
 
         int nuevoStock = kardex.getStockActual();
