@@ -9,7 +9,7 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 
 import com.sudabKardex.ms_kardex.Client.OrdenClient;
-import com.sudabKardex.ms_kardex.Client.ProductoClient;
+
 import com.sudabKardex.ms_kardex.DTO.KardexMovimientoResponseDTO;
 import com.sudabKardex.ms_kardex.DTO.KardexRequestDTO;
 import com.sudabKardex.ms_kardex.DTO.KardexResponseDTO;
@@ -139,33 +139,55 @@ public class KardexService {
     }
 
 
-    public List<Producto> obtenerProductosDisponibles() {
+    public List<ProductoResponseDTO> obtenerProductosDisponibles() {
         List<Long> idsConKardex = kardexRepository.findAll().stream()
                 .map(Kardex::getIdProducto)
                 .toList();
         
+        List<Producto> productosLocales;
         if (idsConKardex.isEmpty()) {
-            return productoRepository.findAll();
+            productosLocales = productoRepository.findAll();
+        } else {
+            productosLocales = productoRepository.findByIdProductoNotIn(idsConKardex);
         }
-        return productoRepository.findByIdProductoNotIn(idsConKardex);
+
+        // Transformación limpia usando la referencia al método privado de abajo
+        return productosLocales.stream()
+                .map(this::convertirAProductoDTO)
+                .collect(Collectors.toList());
     }
 
 
-    public List<Producto> verificarProductosFaltantesDeOrden(Long idOrden) {
+    public List<ProductoResponseDTO> verificarProductosFaltantesDeOrden(Long idOrden) {
+        // Buscamos de forma segura la Orden de Compra remota vía OpenFeign
         OrdenResponseDTO orden = ordenClient.obtenerOrdenPorId(idOrden);
         if (orden == null) {
             throw new EntityNotFoundException("Orden de compra no registrada con el ID: " + idOrden);
         }
 
-        return orden.getDetalles().stream()
+        // Filtramos los productos de la orden que no existen en tu Kárdex local
+        List<Producto> productosFaltantes = orden.getDetalles().stream()
                 .filter(detalle -> !kardexRepository.existsByIdProducto(detalle.getProductoId()))
                 .map(detalle -> productoRepository.findById(detalle.getProductoId()).orElse(null))
                 .filter(Objects::nonNull)
-                .distinct() 
+                .distinct()
+                .toList();
+
+        // Reutilizamos el mismo método helper de mapeo
+        return productosFaltantes.stream()
+                .map(this::convertirAProductoDTO)
                 .collect(Collectors.toList());
     }
 
-    
+
+    private ProductoResponseDTO convertirAProductoDTO(Producto p) {
+        ProductoResponseDTO dto = new ProductoResponseDTO();
+        dto.setIdProducto(p.getIdProducto());
+        dto.setCodigo(p.getCodigo());
+        dto.setNombre(p.getNombre());
+        dto.setUnidadMedida(p.getUnidadMedida());
+        return dto;
+    }
 
 
     // public List<Producto> obtenerProductos() {
