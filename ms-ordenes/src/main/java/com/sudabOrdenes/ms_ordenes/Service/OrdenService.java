@@ -13,14 +13,14 @@ import org.springframework.stereotype.Service;
 
 import com.sudabOrdenes.ms_ordenes.Client.KardexClient;
 import com.sudabOrdenes.ms_ordenes.Client.ProformaClient;
-import com.sudabOrdenes.ms_ordenes.Client.ProveedorClient;
+
 import com.sudabOrdenes.ms_ordenes.DTO.OrdenDetalleDTO;
 import com.sudabOrdenes.ms_ordenes.DTO.OrdenRequestDTO;
 import com.sudabOrdenes.ms_ordenes.DTO.OrdenResponseDTO;
 import com.sudabOrdenes.ms_ordenes.DTO.kardex.KardexMovimientoRequestDTO;
 import com.sudabOrdenes.ms_ordenes.DTO.proforma.DetalleProformaResponseDTO;
 import com.sudabOrdenes.ms_ordenes.DTO.proforma.ProformaResponseDTO;
-import com.sudabOrdenes.ms_ordenes.DTO.proveedor.ProveedorResponseDTO;
+
 import com.sudabOrdenes.ms_ordenes.Model.OrdenCompra;
 import com.sudabOrdenes.ms_ordenes.Model.OrdenCompraDetalle;
 import com.sudabOrdenes.ms_ordenes.Repository.OrdenCompraRepository;
@@ -43,7 +43,7 @@ public class OrdenService {
     // private final KardexService kardexService;
     private final OrdenCompraRepository ordenCompraRepository;
     private final ProformaClient proformaClient;
-    private final ProveedorClient proveedorClient;
+   
     private final KardexClient kardexClient;
     
 
@@ -122,8 +122,6 @@ public class OrdenService {
       }
 
 
-
- 
     public List<OrdenResponseDTO> listarOrdenService() {
         List<OrdenCompra> ordenes= ordenCompraRepository.findAll();
         return ordenes.stream().map(this::convertirAConvertirDTO).toList();
@@ -157,25 +155,6 @@ public class OrdenService {
     }   
 
 
-
-
-
-    // public String aprobarOrdenService(Long id) {
-
-    //     OrdenCompra orden=ordenCompraRepository.findById(id).orElseThrow(() -> new RuntimeException("Orden no encontrada."));
-
-
-    //     if(!"ENVIADA".equals(orden.getEstado())){
-    //         throw new IllegalStateException("Solo se pueden aprobar órdenes en estado ENVIADA.");
-    //     }
-
-    //     orden.setEstado("APROBADA");
-    //     ordenCompraRepository.save(orden);
-
-    //     return "Orden aprobada exitosamente.";
-        
-
-    // }
 
 
     @Transactional
@@ -326,71 +305,53 @@ public List<OrdenResponseDTO> listarPedidosPendientes() {
 
     private OrdenResponseDTO convertirAConvertirDTO(OrdenCompra oc) {
         OrdenResponseDTO dto = new OrdenResponseDTO();
-        dto.setIdOrden(oc.getIdOrden());
-        dto.setCodigo(oc.getCodigo());
-        dto.setFechaCreacion(oc.getFechaCreacion());
-        dto.setMontoTotal(oc.getMontoTotal());
-        dto.setEstado(oc.getEstado());
-        
-        if (oc.getIdProveedor() != null) {
-            ProveedorResponseDTO prov = proveedorClient.obtenerPorId(oc.getIdProveedor());
-            dto.setNombreProveedor(prov.getRazonSocial());
-            dto.setRucProveedor(prov.getRuc());
-        }
-        else{
-            dto.setNombreProveedor("Proveedor no asignado");
+    dto.setIdOrden(oc.getIdOrden());
+    dto.setCodigo(oc.getCodigo());
+    dto.setFechaCreacion(oc.getFechaCreacion());
+    dto.setMontoTotal(oc.getMontoTotal());
+    dto.setEstado(oc.getEstado());
+
+    // Valores por defecto (por si no hay proforma o falla el llamado)
+    dto.setNombreProveedor("Proveedor no asignado");
+    dto.setRucProveedor("0000000");
+
+    // OBTENER REQUERIMIENTO Y PROVEEDOR DESDE ms-proformas VIA FEIGN
+    // (ya no se usa ProveedorClient: el proveedor vive dentro de ms-proformas
+    // y viene incrustado/plano en la respuesta de la proforma)
+    if (oc.getIdProforma() != null) {
+        try {
+            ProformaResponseDTO prof = proformaClient.obtenerPorId(oc.getIdProforma());
+            dto.setCodigoRequerimiento(prof.getCodigoRequerimiento());
+
+            if (prof.getNombreProveedor() != null) {
+                dto.setNombreProveedor(prof.getNombreProveedor());
+                dto.setRucProveedor(prof.getRucProveedor());
+            }
+        } catch (Exception e) {
+            dto.setCodigoRequerimiento("No disponible");
+            dto.setNombreProveedor("Error al cargar proveedor");
             dto.setRucProveedor("0000000");
         }
-        
-        // 2. OBTENER REQUERIMIENTO DESDE EL MICROSERVICIO DE ORIGEN VIA FEIGN
-        if (oc.getIdProforma() != null) {
-            try {
-                ProformaResponseDTO prof = proformaClient.obtenerPorId(oc.getIdProforma());
-                dto.setCodigoRequerimiento(prof.getCodigoRequerimiento());
-                // Asignamos el proveedor que ya viene incrustado o plano en la respuesta de la proforma
-                if (prof.getNombreProveedor() != null) {
-                    dto.setNombreProveedor(prof.getNombreProveedor());
-                    dto.setRucProveedor(prof.getRucProveedor());
-                } else {
-                    dto.setNombreProveedor("Proveedor no asignado");
-                    dto.setRucProveedor("0000000");
-                }
+    }
 
-            } catch (Exception e) {
-                dto.setCodigoRequerimiento("No disponible");
-                dto.setNombreProveedor("Error al cargar proveedor");
-                dto.setRucProveedor("0000000");
+    // 3. DETALLES DE LA ORDEN (sin cambios)
+    if (oc.getDetalles() != null) {
+        List<OrdenDetalleDTO> detallesDTO = oc.getDetalles().stream().map(detalle -> {
+            OrdenDetalleDTO dDto = new OrdenDetalleDTO();
+            dDto.setIdOrdenDetalle(detalle.getIdOrdenDetalle());
+            if (detalle.getIdProducto() != null) {
+                dDto.setProductoId(detalle.getIdProducto());
+                dDto.setNombreProducto(detalle.getNombreProducto());
             }
-        }
+            dDto.setCantidad(detalle.getCantidad());
+            dDto.setPrecioUnitario(detalle.getPrecioUnitario());
+            dDto.setSubtotal(detalle.getCantidad() * detalle.getPrecioUnitario());
+            return dDto;
+        }).toList();
+        dto.setDetalles(detallesDTO);
+    }
 
-        
-        // 3. DETALLES DE LA ORDEN
-        if (oc.getDetalles() != null) {
-            List<OrdenDetalleDTO> detallesDTO = oc.getDetalles().stream().map(detalle -> {
-                OrdenDetalleDTO dDto = new OrdenDetalleDTO();
-                dDto.setIdOrdenDetalle(detalle.getIdOrdenDetalle());
-                if (detalle.getIdProducto() != null) {
-                    // Opción Óptima: El nombre del producto puede ser guardado de forma redundante 
-                    // en orden_detalle al momento de crearse la orden para evitar llamadas HTTP infinitas
-                    // dentro de bucles loops, manteniendo alta la performance del listado.
-                    dDto.setProductoId(detalle.getIdProducto());
-                    dDto.setNombreProducto(detalle.getNombreProducto());
-
-
-                    // dDto.setProductoId(detalle.getProducto().getIdProducto());
-                    // dDto.setNombreProducto(detalle.getProducto().getNombre());
-                }
-                dDto.setCantidad(detalle.getCantidad());
-                dDto.setPrecioUnitario(detalle.getPrecioUnitario());
-                
-                // Calculamos dinámicamente el subtotal en caso de que detalle.getSubtotal() no esté mapeado
-                dDto.setSubtotal(detalle.getCantidad() * detalle.getPrecioUnitario());
-                return dDto;
-            }).toList();
-            dto.setDetalles(detallesDTO);
-        }
-        
-        return dto;
+    return dto;
     }
     
 

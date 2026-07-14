@@ -17,7 +17,10 @@ public class ProformaResponseDTO {
     private Long idRequerimiento;
     private String codigoRequerimiento;
 
-    private Long idProveedor;
+     private Long idProveedor;
+    private String nombreProveedor; // NUEVO
+    private String rucProveedor;
+
     private List<DetalleProformaResponseDTO> productos;
 
 
