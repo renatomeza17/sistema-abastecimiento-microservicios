@@ -12,7 +12,7 @@ import com.sudabOrdenes.ms_ordenes.DTO.proforma.ProformaResponseDTO;
 
 
 
-@FeignClient(name = "ms-proformas",configuration = FeignClientConfig.class)
+@FeignClient(name = "ms-requerimiento",configuration = FeignClientConfig.class)
 public interface ProformaClient {
     // @GetMapping("/{id}")
     // ProformaResponseDTO obtenerProforma(@PathVariable Long id);
