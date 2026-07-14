@@ -48,6 +48,12 @@ services:
     container_name: ms-ordenes
     ports:
       - "8082:8082"
+    environment:
+      SPRING_DATASOURCE_URL: ${ORDENES_DB_URL}
+      SPRING_DATASOURCE_USERNAME: ${ORDENES_DB_USERNAME}
+      SPRING_DATASOURCE_PASSWORD: ${ORDENES_DB_PASSWORD}
+      TOKEN_JWT_SECRET: ${TOKEN_JWT_SECRET}
+
     depends_on:
       eureka-server:
         condition: service_healthy
@@ -110,6 +116,23 @@ services:
       eureka-server:
         condition: service_healthy
       postgres-recepcion:
+        condition: service_healthy
+    networks:
+      - microservicios-proyecto_default
+
+
+  ms-kardex:
+    build: ./ms-kardex
+    container_name: ms-kardex
+    ports:
+      - "8087:8087"    # usa el puerto que configuraste en su application.yml
+    environment:
+      SPRING_DATASOURCE_URL: ${KARDEX_DB_URL}
+      SPRING_DATASOURCE_USERNAME: ${KARDEX_DB_USERNAME}
+      SPRING_DATASOURCE_PASSWORD: ${KARDEX_DB_PASSWORD}
+      TOKEN_JWT_SECRET: ${TOKEN_JWT_SECRET}
+    depends_on:
+      eureka-server:
         condition: service_healthy
     networks:
       - microservicios-proyecto_default
