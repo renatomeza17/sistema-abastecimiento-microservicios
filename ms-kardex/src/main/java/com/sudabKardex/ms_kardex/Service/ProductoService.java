@@ -7,7 +7,7 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.sudabKardex.ms_kardex.DTO.ProductoResponseDTO;
+import com.sudabKardex.ms_kardex.DTO.Producto.ProductoResponseDTO;
 import com.sudabKardex.ms_kardex.Model.Producto;
 import com.sudabKardex.ms_kardex.Repository.ProductoRepository;
 
