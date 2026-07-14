@@ -11,7 +11,8 @@ import com.sudabKardex.ms_kardex.Model.Producto;
 
 @Repository
 public interface ProductoRepository extends JpaRepository<Producto, Long> {
-    @Query("SELECT p FROM Producto p WHERE NOT EXISTS (SELECT k FROM Kardex k WHERE k.producto.idProducto = p.idProducto)")
+    @Query("SELECT p FROM Producto p WHERE NOT EXISTS " +
+       "(SELECT k FROM Kardex k WHERE k.idProducto = p.idProducto)")
     List<Producto> findProductosSinKardex();
 
     // NUEVO: Para listar solo lo disponible para los Jefes de Dependencia
