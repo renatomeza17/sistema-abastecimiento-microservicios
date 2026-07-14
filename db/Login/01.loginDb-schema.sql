@@ -1,38 +1,30 @@
 -- Base de datos: loginDb (microservicio ms-login)
--- Tablas: personas, usuarios, roles, modulo, rol_modulo, usuario_roles
--- Estas tablas SI mantienen sus FOREIGN KEY entre si, porque todas viven
--- dentro de la misma base de datos (son del mismo dominio: Usuarios y Accesos).
+-- Tablas: usuarios, roles, modulo, rol_modulo, usuario_roles
 
-CREATE TABLE IF NOT EXISTS public.personas
-(
-    id_persona bigserial NOT NULL,
-    apellido_materno character varying(100) NOT NULL,
-    apellido_paterno character varying(100) NOT NULL,
-    created_at timestamp NOT NULL DEFAULT now(),
-    direccion character varying(200) NOT NULL,
-    fecha_nacimiento date NOT NULL,
-    nombres character varying(100) NOT NULL,
-    ndocumento character varying(20) NOT NULL,
-    sexo character varying(20) NOT NULL,
-    telefono character varying(20) NOT NULL,
-    tipo_documento character varying(20) NOT NULL,
-    updated_at timestamp NOT NULL DEFAULT now(),
-    CONSTRAINT personas_pkey PRIMARY KEY (id_persona),
-    CONSTRAINT uk_personas_ndocumento UNIQUE (ndocumento)
-);
 
 CREATE TABLE IF NOT EXISTS public.usuarios
 (
     id_usuario bigserial NOT NULL,
-    email character varying(255) NOT NULL,
-    password character varying(255) NOT NULL,
+    -- Datos de acceso
     username character varying(50) NOT NULL,
-    id_persona bigint,
+    password character varying(255) NOT NULL,
+    email character varying(255) NOT NULL,
+    activo boolean NOT NULL DEFAULT true,
+    nombres character varying(100) NOT NULL,
+    apellido_paterno character varying(100) NOT NULL,
+    apellido_materno character varying(100),
+    ndocumento character varying(20) NOT NULL,
+    tipo_documento character varying(20) NOT NULL,
+    direccion character varying(200),
+    fecha_nacimiento date,
+    sexo character varying(20),
+    telefono character varying(20),
+    created_at timestamp NOT NULL DEFAULT now(),
+    updated_at timestamp NOT NULL DEFAULT now(),
     CONSTRAINT usuarios_pkey PRIMARY KEY (id_usuario),
     CONSTRAINT uk_usuarios_username UNIQUE (username),
-    CONSTRAINT uk_usuarios_id_persona UNIQUE (id_persona),
-    CONSTRAINT fk_usuarios_persona FOREIGN KEY (id_persona)
-        REFERENCES public.personas (id_persona)
+    CONSTRAINT uk_usuarios_email UNIQUE (email),
+    CONSTRAINT uk_usuarios_ndocumento UNIQUE (ndocumento)
 );
 
 CREATE TABLE IF NOT EXISTS public.roles

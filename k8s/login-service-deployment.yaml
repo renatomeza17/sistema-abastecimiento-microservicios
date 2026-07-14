@@ -102,10 +102,9 @@ services:
     ports:
       - "8085:8085"
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://ep-divine-bonus-acdcecau-pooler.sa-east-1.aws.neon.tech/recepciondb?sslmode=require&channel_binding=require
-      SPRING_DATASOURCE_USERNAME: neondb_owner
-      SPRING_DATASOURCE_PASSWORD: npg_b2rmGo7zMJYB
-      TOKEN_JWT_SECRET: clave-super-secreta-sudab-2024-abastecimiento
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-recepcion:5432/recepcionDb
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
     depends_on:
       eureka-server:
         condition: service_healthy
