@@ -4,19 +4,27 @@ server:
 spring:
   application:
     name: ms-ordenes
+  config:
+    import: ${SPRING_CONFIG_IMPORT:optional:configserver:http://localhost:8888}
   datasource:
-    driver-class-name: org.postgresql.Driver
-    url: ${SPRING_DATASOURCE_URL}
-    username: ${SPRING_DATASOURCE_USERNAME}
-    password: ${SPRING_DATASOURCE_PASSWORD}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: ${ORDENES_DB_URL}
+    username: ${ORDENES_DB_USERNAME}
+    password: ${ORDENES_DB_PASSWORD}
   jpa:
+    database-platform: org.hibernate.dialect.MySQLDialect
+    show-sql: true
     hibernate:
       ddl-auto: update
-    database-platform: org.hibernate.dialect.PostgreSQLDialect
+      
+
+springdoc:
+  swagger-ui:
+    path: /docs
 
 eureka:
-  instance:
-    prefer-ip-address: true
   client:
-    serviceUrl:
-      defaultZone: http://eureka-server:8761/eureka
+    service-url:
+      defaultZone: ${EUREKA_CLIENT_SERVICEURL_DEFAULTZONE:http://localhost:8761/eureka/}
+    register-with-eureka: true
+    fetch-registry: true
