@@ -1,9 +1,6 @@
 -- Base de datos: loginDb (microservicio ms-login)
 -- Tablas: usuarios, roles, modulo, rol_modulo, usuario_roles
--- Usuario y Persona se fusionaron en una sola tabla/entidad (usuarios),
--- ya que el negocio definio que usuario y persona son uno solo.
--- Estas tablas SI mantienen sus FOREIGN KEY entre si, porque todas viven
--- dentro de la misma base de datos (son del mismo dominio: Usuarios y Accesos).
+
 
 CREATE TABLE IF NOT EXISTS public.usuarios
 (
@@ -13,7 +10,6 @@ CREATE TABLE IF NOT EXISTS public.usuarios
     password character varying(255) NOT NULL,
     email character varying(255) NOT NULL,
     activo boolean NOT NULL DEFAULT true,
-    -- Datos de persona (antes en tabla aparte "personas")
     nombres character varying(100) NOT NULL,
     apellido_paterno character varying(100) NOT NULL,
     apellido_materno character varying(100),
