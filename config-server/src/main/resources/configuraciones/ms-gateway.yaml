@@ -39,23 +39,41 @@ spring:
               filters:
                 - RewritePath=/pedidodependencia/(?<segment>.*), /api/pedidodependencia/${segment}
             - id: login
-              uri: lb://MS-LOGIN
+              uri: https://ms-login-9l2y.onrender.com
               predicates:
                 - Path=/login/**
               filters:
                 - RewritePath=/login/(?<segment>.*), /api/login/${segment}
+            - id: login-base
+              uri: https://ms-login-9l2y.onrender.com
+              predicates:
+                - Path=/login
+              filters:
+                - RewritePath=/login, /api/login
             - id: roles
-              uri: lb://MS-LOGIN
+              uri: https://ms-login-9l2y.onrender.com
               predicates:
                 - Path=/roles/**
               filters:
                 - RewritePath=/roles/(?<segment>.*), /api/roles/${segment}
+            - id: roles-base
+              uri: https://ms-login-9l2y.onrender.com
+              predicates:
+                - Path=/roles
+              filters:
+                - RewritePath=/roles, /api/roles
             - id: usuarios
-              uri: lb://MS-LOGIN
+              uri: https://ms-login-9l2y.onrender.com
               predicates:
                 - Path=/usuarios/**
               filters:
                 - RewritePath=/usuarios/(?<segment>.*), /api/usuarios/${segment}
+            - id: usuarios-base
+              uri: https://ms-login-9l2y.onrender.com
+              predicates:
+                - Path=/usuarios
+              filters:
+                - RewritePath=/usuarios, /api/usuarios
 
 eureka:
   instance:
@@ -65,4 +83,9 @@ eureka:
     fetch-registry: true
     serviceUrl:
       defaultZone: http://eureka-server:8761/eureka
-      defaultZone: http://eureka-server:8761/eureka
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: gateway,health,info

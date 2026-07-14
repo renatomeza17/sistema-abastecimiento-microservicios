@@ -11,6 +11,11 @@ spring:
     url: ${ORDENES_DB_URL}
     username: ${ORDENES_DB_USERNAME}
     password: ${ORDENES_DB_PASSWORD}
+    hikari:
+      maximum-pool-size: 2  
+      minimum-idle: 1
+      connection-timeout: 30000
+      idle-timeout: 60000
   jpa:
     database-platform: org.hibernate.dialect.MySQLDialect
     show-sql: true
