@@ -33,9 +33,6 @@ public class Producto {
     @Column(nullable = false)
     private String unidadMedida; // Ej: "RESMA", "UNIDAD", "CAJA"
 
-    @Column(nullable = false)
-    private Integer stock=0;
-
     @Column(nullable = false)    
     private Boolean activo=true;
 
