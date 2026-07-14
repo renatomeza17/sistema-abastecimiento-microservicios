@@ -1,5 +1,98 @@
+server:
+  port: 8080
+
 spring:
   application:
     name: ms-gateway
-  config:
-    import: ${SPRING_CONFIG_IMPORT:optional:configserver:http://localhost:8888}
+  cloud:
+    gateway:
+      default-filters:
+        - AddRequestHeader=X-Gateway-Request, true
+      routes:
+        - id: ordenes
+          uri: lb://MS-ORDENES
+          predicates:
+            - Path=/orden/**
+          filters:
+            - RewritePath=/orden/(?<segment>.*), /api/ordenes/${segment}
+        - id: requerimiento
+          uri: lb://MS-REQUERIMIENTO
+          predicates:
+            - Path=/requerimiento/**
+          filters:
+            - RewritePath=/requerimiento/(?<segment>.*), /api/requerimientos/${segment}
+        - id: recepcion
+          uri: lb://MS-RECEPCION
+          predicates:
+            - Path=/recepcion/**
+          filters:
+            - RewritePath=/recepcion/(?<segment>.*), /api/pedidos-pendientes/${segment}
+        - id: pedidodependencia
+          uri: lb://MS-PEDIDODEPENDENCIA
+          predicates:
+            - Path=/pedidodependencia/**
+          filters:
+            - RewritePath=/pedidodependencia/(?<segment>.*), /api/dependencias/${segment}
+        - id: kardex
+          uri: lb://MS-KARDEX
+          predicates:
+            - Path=/kardex/**
+          filters:
+            - RewritePath=/kardex/(?<segment>.*), /api/kardex/${segment}
+        - id: productos
+          uri: lb://MS-KARDEX
+          predicates:
+            - Path=/productos/**
+          filters:
+            - RewritePath=/productos/(?<segment>.*), /api/productos/${segment}
+        - id: login
+          uri: https://ms-login-9l2y.onrender.com
+          predicates:
+            - Path=/login/**
+          filters:
+            - RewritePath=/login/(?<segment>.*), /api/login/${segment}
+        - id: login-base
+          uri: https://ms-login-9l2y.onrender.com
+          predicates:
+            - Path=/login
+          filters:
+            - RewritePath=/login, /api/login
+        - id: roles
+          uri: https://ms-login-9l2y.onrender.com
+          predicates:
+            - Path=/roles/**
+          filters:
+            - RewritePath=/roles/(?<segment>.*), /api/roles/${segment}
+        - id: roles-base
+          uri: https://ms-login-9l2y.onrender.com
+          predicates:
+            - Path=/roles
+          filters:
+            - RewritePath=/roles, /api/roles
+        - id: usuarios
+          uri: https://ms-login-9l2y.onrender.com
+          predicates:
+            - Path=/usuarios/**
+          filters:
+            - RewritePath=/usuarios/(?<segment>.*), /api/usuarios/${segment}
+        - id: usuarios-base
+          uri: https://ms-login-9l2y.onrender.com
+          predicates:
+            - Path=/usuarios
+          filters:
+            - RewritePath=/usuarios, /api/usuarios
+
+eureka:
+  instance:
+    prefer-ip-address: true
+  client:
+    register-with-eureka: false
+    fetch-registry: true
+    serviceUrl:
+      defaultZone: http://eureka-server:8761/eureka
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: gateway,health,info
