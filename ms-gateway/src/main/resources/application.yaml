@@ -6,45 +6,7 @@ spring:
     name: ms-gateway
   cloud:
     gateway:
-      default-filters:
-        - AddRequestHeader=X-Gateway-Request, true
       routes:
-        - id: ordenes
-          uri: lb://MS-ORDENES
-          predicates:
-            - Path=/orden/**
-          filters:
-            - RewritePath=/orden/(?<segment>.*), /api/ordenes/${segment}
-        - id: requerimiento
-          uri: lb://MS-REQUERIMIENTO
-          predicates:
-            - Path=/requerimiento/**
-          filters:
-            - RewritePath=/requerimiento/(?<segment>.*), /api/requerimientos/${segment}
-        - id: recepcion
-          uri: lb://MS-RECEPCION
-          predicates:
-            - Path=/recepcion/**
-          filters:
-            - RewritePath=/recepcion/(?<segment>.*), /api/pedidos-pendientes/${segment}
-        - id: pedidodependencia
-          uri: lb://MS-PEDIDODEPENDENCIA
-          predicates:
-            - Path=/pedidodependencia/**
-          filters:
-            - RewritePath=/pedidodependencia/(?<segment>.*), /api/dependencias/${segment}
-        - id: kardex
-          uri: lb://MS-KARDEX
-          predicates:
-            - Path=/kardex/**
-          filters:
-            - RewritePath=/kardex/(?<segment>.*), /api/kardex/${segment}
-        - id: productos
-          uri: lb://MS-KARDEX
-          predicates:
-            - Path=/productos/**
-          filters:
-            - RewritePath=/productos/(?<segment>.*), /api/productos/${segment}
         - id: login
           uri: https://ms-login-9l2y.onrender.com
           predicates:
@@ -83,13 +45,8 @@ spring:
             - RewritePath=/usuarios, /api/usuarios
 
 eureka:
-  instance:
-    prefer-ip-address: true
   client:
-    register-with-eureka: false
-    fetch-registry: true
-    serviceUrl:
-      defaultZone: http://eureka-server:8761/eureka
+    enabled: false
 
 management:
   endpoints:
