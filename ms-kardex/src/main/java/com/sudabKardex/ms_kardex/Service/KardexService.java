@@ -16,6 +16,7 @@ import com.sudabKardex.ms_kardex.DTO.Orden.OrdenResponseDTO;
 import com.sudabKardex.ms_kardex.DTO.Producto.ProductoResponseDTO;
 import com.sudabKardex.ms_kardex.Model.Kardex;
 import com.sudabKardex.ms_kardex.Model.KardexMovimiento;
+import com.sudabKardex.ms_kardex.Model.Producto;
 import com.sudabKardex.ms_kardex.Repository.KardexMovimientoRepository;
 import com.sudabKardex.ms_kardex.Repository.KardexRepository;
 import com.sudabKardex.ms_kardex.Repository.ProductoRepository;
@@ -40,27 +41,24 @@ public class KardexService {
     // --- LOGICA PARA HU11: CREAR NUEVO ASIENTO (PRODUCTO NUEVO) ---
     @Transactional
     public Kardex registrarNuevoAsiento(KardexRequestDTO dto) {
-        // 1. Verificar si el producto existe en el catálogo maestro
-        ProductoResponseDTO prod = productoClient.obtenerProductoPorId(dto.getIdProducto());
-        if (prod == null) {
-            throw new EntityNotFoundException("Producto no registrado en el catálogo maestro institucional.");
-        }
+        Producto prod = productoRepository.findById(dto.getIdProducto())
+                    .orElseThrow(() -> new EntityNotFoundException("Producto no registrado en el catálogo maestro institucional."));
 
-        // 2. Validar que no tenga ya un Kárdex abierto
-        if(kardexRepository.findByIdProducto(dto.getIdProducto()).isPresent()){
-            throw new IllegalStateException("El producto ya cuenta con una ficha de Kárdex activa.");
-        }
+            // Validar que no tenga ya un Kárdex abierto
+            if (kardexRepository.findByIdProducto(dto.getIdProducto()).isPresent()) {
+                throw new IllegalStateException("El producto ya cuenta con una ficha de Kárdex activa.");
+            }
 
-        // 3. Crear cabecera de Kárdex
-        Kardex nuevoKardex = new Kardex();
-        nuevoKardex.setIdProducto(dto.getIdProducto());
-        nuevoKardex.setStockActual(0); // Nace en cero hasta que entre una OC
-        nuevoKardex.setStockMinimo(dto.getStockMinimo());
-        nuevoKardex.setUbicacionAlmacen(dto.getUbicacionAlmacen());
-        nuevoKardex.setFechaApertura(LocalDate.now());
-        nuevoKardex.setCaracteristicas(dto.getCaracteristicas());
+            // Crear cabecera de Kárdex
+            Kardex nuevoKardex = new Kardex();
+            nuevoKardex.setIdProducto(prod.getIdProducto());
+            nuevoKardex.setStockActual(0); // Nace en cero hasta que entre una OC conforme
+            nuevoKardex.setStockMinimo(dto.getStockMinimo());
+            nuevoKardex.setUbicacionAlmacen(dto.getUbicacionAlmacen());
+            nuevoKardex.setFechaApertura(LocalDate.now());
+            nuevoKardex.setCaracteristicas(dto.getCaracteristicas());
 
-        return kardexRepository.save(nuevoKardex);
+            return kardexRepository.save(nuevoKardex);
     }
 
 
@@ -70,11 +68,9 @@ public class KardexService {
     // --- LOGICA PARA HU10: ACTUALIZACIÓN AUTOMÁTICA (ENTRADAS / SALIDAS) ---
     @Transactional
     public void registrarMovimiento(Long idProducto, Integer cantidad, String tipo, String docReferencia, String obs) {
-        // 1. Buscar el Kárdex asociado al producto
         Kardex kardex = kardexRepository.findByIdProducto(idProducto)
             .orElseThrow(() -> new EntityNotFoundException("No existe un asiento de Kárdex para este producto. Debe crearlo primero (HU11)."));
 
-        // 2. Calcular el nuevo stock real según la HU10
         int nuevoStock = kardex.getStockActual();
         if ("ENTRADA".equalsIgnoreCase(tipo)) {
             nuevoStock += cantidad;
@@ -85,11 +81,9 @@ public class KardexService {
             nuevoStock -= cantidad;
         }
 
-        // 3. Actualizar cabecera
         kardex.setStockActual(nuevoStock);
         kardexRepository.save(kardex);
 
-        // 4. Guardar en el histórico de movimientos (Auditoría)
         KardexMovimiento movimiento = new KardexMovimiento();
         movimiento.setKardex(kardex);
         movimiento.setTipoMovimiento(tipo.toUpperCase());
