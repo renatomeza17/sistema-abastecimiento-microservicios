@@ -347,8 +347,19 @@ public List<OrdenResponseDTO> listarPedidosPendientes() {
             try {
                 ProformaResponseDTO prof = proformaClient.obtenerPorId(oc.getIdProforma());
                 dto.setCodigoRequerimiento(prof.getCodigoRequerimiento());
+                // Asignamos el proveedor que ya viene incrustado o plano en la respuesta de la proforma
+                if (prof.getNombreProveedor() != null) {
+                    dto.setNombreProveedor(prof.getNombreProveedor());
+                    dto.setRucProveedor(prof.getRucProveedor());
+                } else {
+                    dto.setNombreProveedor("Proveedor no asignado");
+                    dto.setRucProveedor("0000000");
+                }
+
             } catch (Exception e) {
                 dto.setCodigoRequerimiento("No disponible");
+                dto.setNombreProveedor("Error al cargar proveedor");
+                dto.setRucProveedor("0000000");
             }
         }
 
