@@ -1,0 +1,42 @@
+package com.sudabKardex.ms_kardex.Model;
+
+import org.springframework.data.annotation.Id;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Entity
+@AllArgsConstructor
+@Data
+@NoArgsConstructor
+@Table(name = "producto")
+public class Producto {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long idProducto;
+
+    @Column(name="codigo",nullable = false, unique = true)
+    private String codigo;
+
+    @Column(unique = true, nullable = false)
+    private String nombre;
+
+    @Column(nullable = false, length = 200)
+    private String descripcion;
+
+    @Column(nullable = false)
+    private String unidadMedida; // Ej: "RESMA", "UNIDAD", "CAJA"
+
+    @Column(nullable = false)
+    private Integer stock=0;
+
+    @Column(nullable = false)    
+    private Boolean activo=true;
+
+}

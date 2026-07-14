@@ -18,6 +18,7 @@ import com.sudabKardex.ms_kardex.Model.Kardex;
 import com.sudabKardex.ms_kardex.Model.KardexMovimiento;
 import com.sudabKardex.ms_kardex.Repository.KardexMovimientoRepository;
 import com.sudabKardex.ms_kardex.Repository.KardexRepository;
+import com.sudabKardex.ms_kardex.Repository.ProductoRepository;
 
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
@@ -29,10 +30,11 @@ public class KardexService {
 
     private final KardexRepository kardexRepository;
     private final KardexMovimientoRepository movimientoRepository;
+    private final ProductoRepository productoRepository;
     // private final ProductoRepository productoRepository; 
     // private final OrdenCompraRepository ordenCompraRepository;
 
-    private final ProductoClient productoClient;
+    // private final ProductoClient productoClient;
     private final OrdenClient ordenClient;
 
     // --- LOGICA PARA HU11: CREAR NUEVO ASIENTO (PRODUCTO NUEVO) ---
