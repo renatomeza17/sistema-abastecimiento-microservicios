@@ -5,7 +5,7 @@ spring:
   application:
     name: ms-kardex
   config:
-    import: ${SPRING_CONFIG_IMPORT:optional:configserver:http://localhost:8888}
+    import: configserver:https://config-serve.onrender.com
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: ${KARDEX_DB_URL}
@@ -24,4 +24,4 @@ springdoc:
 eureka:
   client:
     service-url:
-      defaultZone: http://localhost:8761/eureka/
+      defaultZone: https://sistema-abastecimiento-microservicios.onrender.com/eureka/
