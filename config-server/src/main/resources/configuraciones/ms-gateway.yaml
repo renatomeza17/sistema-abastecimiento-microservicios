@@ -19,13 +19,13 @@ spring:
               predicates:
                 - Path=/orden/**
               filters:
-                - RewritePath=/orden/(?<segment>.*), /api/orden/${segment}
+                - RewritePath=/orden/(?<segment>.*), /api/ordenes/${segment}
             - id: requerimiento
               uri: lb://MS-REQUERIMIENTO
               predicates:
                 - Path=/requerimiento/**
               filters:
-                - RewritePath=/requerimiento/(?<segment>.*), /api/requerimiento/${segment}
+                - RewritePath=/requerimiento/(?<segment>.*), /api/requerimientos/${segment}
             - id: recepcion
               uri: lb://MS-RECEPCION
               predicates:
@@ -37,7 +37,7 @@ spring:
               predicates:
                 - Path=/pedidodependencia/**
               filters:
-                - RewritePath=/pedidodependencia/(?<segment>.*), /api/pedidodependencia/${segment}
+                - RewritePath=/pedidodependencia/(?<segment>.*), /api/dependencias/${segment}
             - id: login
               uri: https://ms-login-9l2y.onrender.com
               predicates:
@@ -74,6 +74,19 @@ spring:
                 - Path=/usuarios
               filters:
                 - RewritePath=/usuarios, /api/usuarios
+
+            - id: kardex
+              uri: lb://MS-KARDEX
+              predicates:
+                - Path=/kardex/**
+              filters:
+                - RewritePath=/kardex/(?<segment>.*), /api/kardex/${segment}
+            - id: productos
+              uri: lb://MS-KARDEX
+              predicates:
+                - Path=/productos/**
+              filters:
+                - RewritePath=/productos/(?<segment>.*), /api/productos/${segment}
 
 eureka:
   instance:
