@@ -167,7 +167,7 @@ public class KardexService {
 
         // Filtramos los productos de la orden que no existen en tu Kárdex local
         List<Producto> productosFaltantes = orden.getDetalles().stream()
-                .filter(detalle -> !kardexRepository.existsByIdProducto(detalle.getProductoId()))
+                .filter(detalle -> !kardexRepository.existsByProductoIdProducto(detalle.getProductoId()))
                 .map(detalle -> productoRepository.findById(detalle.getProductoId()).orElse(null))
                 .filter(Objects::nonNull)
                 .distinct()
