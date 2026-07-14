@@ -39,37 +39,37 @@ spring:
               filters:
                 - RewritePath=/pedidodependencia/(?<segment>.*), /api/dependencias/${segment}
             - id: login
-              uri: https://ms-login-9l2y.onrender.com
+              uri: lb://MS-LOGIN
               predicates:
                 - Path=/login/**
               filters:
                 - RewritePath=/login/(?<segment>.*), /api/login/${segment}
             - id: login-base
-              uri: https://ms-login-9l2y.onrender.com
+              uri: lb://MS-LOGIN
               predicates:
                 - Path=/login
               filters:
                 - RewritePath=/login, /api/login
             - id: roles
-              uri: https://ms-login-9l2y.onrender.com
+              uri: lb://MS-LOGIN
               predicates:
                 - Path=/roles/**
               filters:
                 - RewritePath=/roles/(?<segment>.*), /api/roles/${segment}
             - id: roles-base
-              uri: https://ms-login-9l2y.onrender.com
+              uri: lb://MS-LOGIN
               predicates:
                 - Path=/roles
               filters:
                 - RewritePath=/roles, /api/roles
             - id: usuarios
-              uri: https://ms-login-9l2y.onrender.com
+              uri: lb://MS-LOGIN
               predicates:
                 - Path=/usuarios/**
               filters:
                 - RewritePath=/usuarios/(?<segment>.*), /api/usuarios/${segment}
             - id: usuarios-base
-              uri: https://ms-login-9l2y.onrender.com
+              uri: lb://MS-LOGIN
               predicates:
                 - Path=/usuarios
               filters:

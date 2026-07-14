@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   config-server:
     build:
@@ -15,7 +13,7 @@ services:
       retries: 10
       start_period: 30s
     networks:
-      - microservicios-proyecto_default
+      - microservicios-network
 
   eureka-server:
     build:
@@ -24,6 +22,8 @@ services:
     container_name: eureka-server
     ports:
       - "8761:8761"
+    environment:
+      SPRING_CONFIG_IMPORT: configserver:http://config-server:8888
     depends_on:
       config-server:
         condition: service_healthy
@@ -34,7 +34,7 @@ services:
       retries: 10
       start_period: 30s
     networks:
-      - microservicios-proyecto_default
+      - microservicios-network
 
   ms-gateway:
     build:
@@ -43,56 +43,59 @@ services:
     container_name: ms-gateway
     ports:
       - "8080:8080"
-    depends_on:
-      eureka-server:
-        condition: service_healthy
-    networks:
-      - microservicios-proyecto_default
-
-  ms-ordenes:
-    build:
-      context: .
-      dockerfile: ./ms-ordenes/Dockerfile
-    container_name: ms-ordenes
-    ports:
-      - "8082:8082"
     environment:
-      SPRING_DATASOURCE_URL: ${ORDENES_DB_URL}
-      SPRING_DATASOURCE_USERNAME: ${ORDENES_DB_USERNAME}
-      SPRING_DATASOURCE_PASSWORD: ${ORDENES_DB_PASSWORD}
-      TOKEN_JWT_SECRET: ${TOKEN_JWT_SECRET}
-
+      SPRING_CLOUD_CONFIG_ENABLED: "true"
+      SPRING_CLOUD_CONFIG_URI: http://config-server:8888
     depends_on:
+      config-server:
+        condition: service_healthy
       eureka-server:
         condition: service_healthy
     networks:
-      - microservicios-proyecto_default
+      - microservicios-network
 
-  ms-requerimiento:
+  postgres-login:
+    image: postgres:16-alpine
+    container_name: postgres-login
+    environment:
+      POSTGRES_DB: loginDb
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5433:5432"
+    volumes:
+      - ./db/Login:/docker-entrypoint-initdb.d
+      - postgres-login-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - microservicios-network
+
+  ms-login:
     build:
       context: .
-      dockerfile: ./ms-requerimiento/Dockerfile
-    container_name: ms-requerimiento
+      dockerfile: ./ms-login/Dockerfile
+    container_name: ms-login
     ports:
-      - "8083:8083"
+      - "8086:8086"
+    environment:
+      SPRING_CONFIG_IMPORT: configserver:http://config-server:8888
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-login:5432/loginDb
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+      TOKEN_JWT_SECRET: clave-super-secreta-sudab-2024-abastecimiento
     depends_on:
+      config-server:
+        condition: service_healthy
       eureka-server:
         condition: service_healthy
-    networks:
-      - microservicios-proyecto_default
-
-  ms-pedidodependencia:
-    build:
-      context: .
-      dockerfile: ./ms-pedidodependencia/Dockerfile
-    container_name: ms-pedidodependencia
-    ports:
-      - "8084:8084"
-    depends_on:
-      eureka-server:
+      postgres-login:
         condition: service_healthy
     networks:
-      - microservicios-proyecto_default
+      - microservicios-network
 
   postgres-recepcion:
     image: postgres:16-alpine
@@ -112,7 +115,7 @@ services:
       timeout: 5s
       retries: 5
     networks:
-      - microservicios-proyecto_default
+      - microservicios-network
 
   ms-recepcion:
     build:
@@ -122,18 +125,77 @@ services:
     ports:
       - "8085:8085"
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://ep-divine-bonus-acdcecau-pooler.sa-east-1.aws.neon.tech/recepciondb?sslmode=require&channel_binding=require
-      SPRING_DATASOURCE_USERNAME: neondb_owner
-      SPRING_DATASOURCE_PASSWORD: npg_b2rmGo7zMJYB
+      SPRING_CONFIG_IMPORT: configserver:http://config-server:8888
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-recepcion:5432/recepcionDb
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
       TOKEN_JWT_SECRET: clave-super-secreta-sudab-2024-abastecimiento
     depends_on:
+      config-server:
+        condition: service_healthy
       eureka-server:
         condition: service_healthy
       postgres-recepcion:
         condition: service_healthy
     networks:
-      - microservicios-proyecto_default
+      - microservicios-network
+  ms-ordenes:
+    build:
+      context: .
+      dockerfile: ./ms-ordenes/Dockerfile
+    container_name: ms-ordenes
+    ports:
+      - "8082:8082"
+    environment:
+      SPRING_CONFIG_IMPORT: configserver:http://config-server:8888
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka
+      SPRING_DATASOURCE_URL: ${ORDENES_DB_URL}
+      SPRING_DATASOURCE_USERNAME: ${ORDENES_DB_USERNAME}
+      SPRING_DATASOURCE_PASSWORD: ${ORDENES_DB_PASSWORD}
+      TOKEN_JWT_SECRET: ${TOKEN_JWT_SECRET}
+    depends_on:
+      config-server:
+        condition: service_healthy
+      eureka-server:
+        condition: service_healthy
+    networks:
+      - microservicios-network
 
+  ms-requerimiento:
+    build:
+      context: .
+      dockerfile: ./ms-requerimiento/Dockerfile
+    container_name: ms-requerimiento
+    ports:
+      - "8083:8083"
+    environment:
+      SPRING_CONFIG_IMPORT: configserver:http://config-server:8888
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka
+    depends_on:
+      config-server:
+        condition: service_healthy
+      eureka-server:
+        condition: service_healthy
+    networks:
+      - microservicios-network
+
+  ms-pedidodependencia:
+    build:
+      context: .
+      dockerfile: ./ms-pedidodependencia/Dockerfile
+    container_name: ms-pedidodependencia
+    ports:
+      - "8084:8084"
+    environment:
+      SPRING_CONFIG_IMPORT: configserver:http://config-server:8888
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka
+    depends_on:
+      config-server:
+        condition: service_healthy
+      eureka-server:
+        condition: service_healthy
+    networks:
+      - microservicios-network
 
   ms-kardex:
     build:
@@ -143,37 +205,24 @@ services:
     ports:
       - "8087:8087"
     environment:
+      SPRING_CONFIG_IMPORT: configserver:http://config-server:8888
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka
       SPRING_DATASOURCE_URL: ${KARDEX_DB_URL}
       SPRING_DATASOURCE_USERNAME: ${KARDEX_DB_USERNAME}
       SPRING_DATASOURCE_PASSWORD: ${KARDEX_DB_PASSWORD}
       TOKEN_JWT_SECRET: ${TOKEN_JWT_SECRET}
     depends_on:
+      config-server:
+        condition: service_healthy
       eureka-server:
         condition: service_healthy
     networks:
-      - microservicios-proyecto_default
-
-  ms-login:
-    build:
-      context: .
-      dockerfile: ./ms-login/Dockerfile
-    container_name: ms-login
-    ports:
-      - "8086:8086"
-    environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://ep-divine-bonus-acdcecau-pooler.sa-east-1.aws.neon.tech/logindb?sslmode=require&channel_binding=require
-      SPRING_DATASOURCE_USERNAME: neondb_owner
-      SPRING_DATASOURCE_PASSWORD: npg_b2rmGo7zMJYB
-      TOKEN_JWT_SECRET: clave-super-secreta-sudab-2024-abastecimiento
-    depends_on:
-      eureka-server:
-        condition: service_healthy
-    networks:
-      - microservicios-proyecto_default
+      - microservicios-network
 
 volumes:
+  postgres-login-data:
   postgres-recepcion-data:
 
 networks:
-  microservicios-proyecto_default:
-    external: true
+  microservicios-network:
+    driver: bridge

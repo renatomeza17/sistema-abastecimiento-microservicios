@@ -1,0 +1,40 @@
+spring:
+  cloud:
+    gateway:
+      routes:
+        - id: login
+          uri: http://localhost:8086
+          predicates:
+            - Path=/login/**
+          filters:
+            - RewritePath=/login/(?<segment>.*), /api/login/${segment}
+        - id: login-base
+          uri: http://localhost:8086
+          predicates:
+            - Path=/login
+          filters:
+            - RewritePath=/login, /api/login
+        - id: roles
+          uri: http://localhost:8086
+          predicates:
+            - Path=/roles/**
+          filters:
+            - RewritePath=/roles/(?<segment>.*), /api/roles/${segment}
+        - id: roles-base
+          uri: http://localhost:8086
+          predicates:
+            - Path=/roles
+          filters:
+            - RewritePath=/roles, /api/roles
+        - id: usuarios
+          uri: http://localhost:8086
+          predicates:
+            - Path=/usuarios/**
+          filters:
+            - RewritePath=/usuarios/(?<segment>.*), /api/usuarios/${segment}
+        - id: usuarios-base
+          uri: http://localhost:8086
+          predicates:
+            - Path=/usuarios
+          filters:
+            - RewritePath=/usuarios, /api/usuarios
