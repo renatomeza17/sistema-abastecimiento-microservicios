@@ -6,7 +6,6 @@
 		<groupId>com.sudabContainer</groupId>
 		<artifactId>sudab-container</artifactId>
 		<version>1.0-SNAPSHOT</version>
-		<relativePath>../pom.xml</relativePath>
 	</parent>
 	<groupId>com.sudabLogin</groupId>
 	<artifactId>ms-login</artifactId>
