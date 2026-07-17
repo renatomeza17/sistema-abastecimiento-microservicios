@@ -2,6 +2,8 @@ package com.sudab.requerimientos.service.impl;
 
 import java.util.UUID;
 
+import com.sudab.requerimientos.client.ProductoClient;
+import com.sudab.requerimientos.client.UsuarioClient;
 import com.sudab.requerimientos.dto.request.ElegirMejorProformaRequestDTO;
 import com.sudab.requerimientos.dto.request.ProformaRequestDTO;
 import com.sudab.requerimientos.dto.response.ProformaResponseDTO;
@@ -16,6 +18,7 @@ import com.sudab.requerimientos.repository.ProformaRepository;
 import com.sudab.requerimientos.repository.RequerimientoRepository;
 import com.sudab.requerimientos.service.CodigoGeneratorService;
 import com.sudab.requerimientos.service.ProformaService;
+import feign.FeignException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,6 +34,8 @@ public class ProformaServiceImpl implements ProformaService {
     private final RequerimientoRepository requerimientoRepository;
     private final ProformaMapper proformaMapper;
     private final CodigoGeneratorService codigoGeneratorService;
+    private final UsuarioClient usuarioClient;
+    private final ProductoClient productoClient;
 
     @Override
     public ProformaResponseDTO cotizar(UUID idRequerimiento, ProformaRequestDTO dto) {
@@ -43,6 +48,20 @@ public class ProformaServiceImpl implements ProformaService {
                     "Solo se pueden agregar proformas a un requerimiento PENDIENTE. Estado actual: "
                             + requerimiento.getEstado()
             );
+        }
+
+        try {
+            usuarioClient.obtenerUsuarioPorId(dto.idUsuario());
+        } catch (FeignException e) {
+            throw new ResourceNotFoundException("Usuario no encontrado con id: " + dto.idUsuario());
+        }
+
+        for (var detalle : dto.detalles()) {
+            try {
+                productoClient.obtenerProductoPorId(detalle.idProducto());
+            } catch (FeignException e) {
+                throw new ResourceNotFoundException("Producto no encontrado con id: " + detalle.idProducto());
+            }
         }
 
         Proforma proforma = proformaMapper.toEntity(dto, requerimiento);

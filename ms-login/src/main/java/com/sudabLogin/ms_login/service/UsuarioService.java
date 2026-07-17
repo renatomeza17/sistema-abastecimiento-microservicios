@@ -7,6 +7,7 @@ import com.sudabLogin.ms_login.dto.RegistrarUsuarioDTO;
 import com.sudabLogin.ms_login.model.Usuario;
 import com.sudabLogin.ms_login.repository.UsuarioRepository;
 
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -22,13 +23,10 @@ public class UsuarioService {
         }
 
         Usuario usuario = new Usuario();
-        // Datos de acceso
         usuario.setUsername(request.getUsername());
         usuario.setEmail(request.getEmail());
-        // NUNCA se guarda el password en texto plano, siempre encriptado
         usuario.setPassword(passwordEncoder.encode(request.getPassword()));
 
-        // Datos de persona (ahora viven en el mismo registro de usuario)
         usuario.setNombres(request.getNombres());
         usuario.setApellidoPaterno(request.getApellidoPaterno());
         usuario.setApellidoMaterno(request.getApellidoMaterno());
@@ -40,5 +38,10 @@ public class UsuarioService {
         usuario.setTelefono(request.getTelefono());
 
         return usuarioRepository.save(usuario);
+    }
+
+    public Usuario obtenerPorId(Long id) {
+        return usuarioRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Usuario no encontrado con id: " + id));
     }
 }

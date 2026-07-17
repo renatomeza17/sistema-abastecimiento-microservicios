@@ -1,5 +1,6 @@
 package com.sudab.requerimientos.service.impl;
 
+import com.sudab.requerimientos.client.UsuarioClient;
 import com.sudab.requerimientos.dto.request.ProveedorRequestDTO;
 import com.sudab.requerimientos.dto.response.ProveedorResponseDTO;
 import com.sudab.requerimientos.exception.BusinessException;
@@ -8,6 +9,7 @@ import com.sudab.requerimientos.mapper.ProveedorMapper;
 import com.sudab.requerimientos.model.Proveedor;
 import com.sudab.requerimientos.repository.ProveedorRepository;
 import com.sudab.requerimientos.service.ProveedorService;
+import feign.FeignException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,9 +24,16 @@ public class ProveedorServiceImpl implements ProveedorService {
 
     private final ProveedorRepository proveedorRepository;
     private final ProveedorMapper proveedorMapper;
+    private final UsuarioClient usuarioClient;
 
     @Override
     public ProveedorResponseDTO crear(ProveedorRequestDTO dto) {
+        try {
+            usuarioClient.obtenerUsuarioPorId(dto.idUsuario());
+        } catch (FeignException e) {
+            throw new ResourceNotFoundException("Usuario no encontrado con id: " + dto.idUsuario());
+        }
+
         if (proveedorRepository.existsByRuc(dto.ruc())) {
             throw new BusinessException("Ya existe un proveedor con el RUC: " + dto.ruc());
         }

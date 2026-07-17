@@ -1,5 +1,6 @@
 package com.sudab.requerimientos.exception;
 
+import feign.FeignException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -41,6 +42,16 @@ public class GlobalExceptionHandler {
                 "Error de validacion", "Uno o mas campos son invalidos", errores
         );
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(body);
+    }
+
+    @ExceptionHandler(FeignException.class)
+    public ResponseEntity<ErrorResponse> handleFeign(FeignException ex) {
+        String message = "Error de comunicacion con otro servicio: " + ex.getMessage();
+        ErrorResponse body = new ErrorResponse(
+                LocalDateTime.now(), HttpStatus.SERVICE_UNAVAILABLE.value(),
+                "Servicio no disponible", message, List.of()
+        );
+        return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(body);
     }
 
     @ExceptionHandler(Exception.class)

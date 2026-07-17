@@ -2,7 +2,9 @@ version: '3.8'
 
 services:
   config-server:
-    build: ./config-server
+    build:
+      context: .
+      dockerfile: ./config-server/Dockerfile
     container_name: config-server
     ports:
       - "8888:8888"
@@ -16,7 +18,9 @@ services:
       - microservicios-proyecto_default
 
   eureka-server:
-    build: ./eureka-server
+    build:
+      context: .
+      dockerfile: ./eureka-server/Dockerfile
     container_name: eureka-server
     ports:
       - "8761:8761"
@@ -33,7 +37,9 @@ services:
       - microservicios-proyecto_default
 
   ms-gateway:
-    build: ./ms-gateway
+    build:
+      context: .
+      dockerfile: ./ms-gateway/Dockerfile
     container_name: ms-gateway
     ports:
       - "8080:8080"
@@ -44,7 +50,9 @@ services:
       - microservicios-proyecto_default
 
   ms-ordenes:
-    build: ./ms-ordenes
+    build:
+      context: .
+      dockerfile: ./ms-ordenes/Dockerfile
     container_name: ms-ordenes
     ports:
       - "8082:8082"
@@ -61,7 +69,9 @@ services:
       - microservicios-proyecto_default
 
   ms-requerimiento:
-    build: ./ms-requerimiento
+    build:
+      context: .
+      dockerfile: ./ms-requerimiento/Dockerfile
     container_name: ms-requerimiento
     ports:
       - "8083:8083"
@@ -72,7 +82,9 @@ services:
       - microservicios-proyecto_default
 
   ms-pedidodependencia:
-    build: ./ms-pedidodependencia
+    build:
+      context: .
+      dockerfile: ./ms-pedidodependencia/Dockerfile
     container_name: ms-pedidodependencia
     ports:
       - "8084:8084"
@@ -103,7 +115,9 @@ services:
       - microservicios-proyecto_default
 
   ms-recepcion:
-    build: ./ms-recepcion
+    build:
+      context: .
+      dockerfile: ./ms-recepcion/Dockerfile
     container_name: ms-recepcion
     ports:
       - "8085:8085"
@@ -122,10 +136,12 @@ services:
 
 
   ms-kardex:
-    build: ./ms-kardex
+    build:
+      context: .
+      dockerfile: ./ms-kardex/Dockerfile
     container_name: ms-kardex
     ports:
-      - "8087:8087"    # usa el puerto que configuraste en su application.yml
+      - "8087:8087"
     environment:
       SPRING_DATASOURCE_URL: ${KARDEX_DB_URL}
       SPRING_DATASOURCE_USERNAME: ${KARDEX_DB_USERNAME}
@@ -138,7 +154,9 @@ services:
       - microservicios-proyecto_default
 
   ms-login:
-    build: ./ms-login
+    build:
+      context: .
+      dockerfile: ./ms-login/Dockerfile
     container_name: ms-login
     ports:
       - "8086:8086"
