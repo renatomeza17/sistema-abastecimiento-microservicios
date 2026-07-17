@@ -42,7 +42,7 @@
     <module>ms-ordenes</module>
     <module>ms-recepcion</module>
     <module>ms-kardex</module>
-    <module>ms-gateway</module>
     <module>ms-login</module>
+    <module>ms-gateway</module>
   </modules>
 </project>

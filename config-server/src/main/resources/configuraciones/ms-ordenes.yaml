@@ -5,12 +5,12 @@ spring:
   application:
     name: ms-ordenes
   config:
-    import: ${SPRING_CONFIG_IMPORT:optional:configserver:http://localhost:8888}
+    import: ${SPRING_CONFIG_IMPORT:optional:configserver:http://config-server:8888}
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: ${ORDENES_DB_URL}
-    username: ${ORDENES_DB_USERNAME}
-    password: ${ORDENES_DB_PASSWORD}
+    url: jdbc:mysql://mysql-ordenes:3306/ordenesDb
+    username: root
+    password: root
     hikari:
       maximum-pool-size: 2  
       minimum-idle: 1
@@ -21,7 +21,6 @@ spring:
     show-sql: true
     hibernate:
       ddl-auto: update
-      
 
 springdoc:
   swagger-ui:
@@ -30,17 +29,6 @@ springdoc:
 eureka:
   client:
     service-url:
-      defaultZone: ${EUREKA_CLIENT_SERVICEURL_DEFAULTZONE:http://localhost:8761/eureka/}
-    register-with-eureka: true
-    fetch-registry: true
-
-springdoc:
-  swagger-ui:
-    path: /docs
-
-eureka:
-  client:
-    service-url:
-      defaultZone: ${EUREKA_CLIENT_SERVICEURL_DEFAULTZONE:http://localhost:8761/eureka/}
+      defaultZone: ${EUREKA_CLIENT_SERVICEURL_DEFAULTZONE:http://eureka-server:8761/eureka/}
     register-with-eureka: true
     fetch-registry: true

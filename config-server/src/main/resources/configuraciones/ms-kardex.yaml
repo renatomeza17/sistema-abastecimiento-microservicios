@@ -8,9 +8,9 @@ spring:
     import: ${SPRING_CONFIG_IMPORT:optional:configserver:http://localhost:8888}
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: ${KARDEX_DB_URL}
-    username: ${KARDEX_DB_USERNAME}
-    password: ${KARDEX_DB_PASSWORD}
+    url: jdbc:mysql://mysql-kardex:3306/kardexDb
+    username: root
+    password: root
     hikari:
       maximum-pool-size: 3
       minimum-idle: 1
@@ -31,4 +31,4 @@ springdoc:
 eureka:
   client:
     service-url:
-      defaultZone: ${EUREKA_CLIENT_SERVICEURL_DEFAULTZONE:http://localhost:8761/eureka/}
+      defaultZone: ${EUREKA_CLIENT_SERVICEURL_DEFAULTZONE:http://eureka-server:8761/eureka/}

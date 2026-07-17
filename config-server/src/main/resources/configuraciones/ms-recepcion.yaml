@@ -6,9 +6,9 @@ spring:
     name: ms-recepcion
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: ${SPRING_DATASOURCE_URL}
-    username: ${SPRING_DATASOURCE_USERNAME}
-    password: ${SPRING_DATASOURCE_PASSWORD}
+    url: jdbc:postgresql://postgres-recepcion:5432/recepcionDb
+    username: postgres
+    password: postgres
   jpa:
     hibernate:
       ddl-auto: update

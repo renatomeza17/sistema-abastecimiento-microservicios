@@ -6,9 +6,9 @@ spring:
     name: ms-requerimiento
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: ${SPRING_DATASOURCE_URL}
-    username: ${SPRING_DATASOURCE_USERNAME}
-    password: ${SPRING_DATASOURCE_PASSWORD}
+    url: jdbc:postgresql://postgres-requerimiento:5432/requerimientoDb
+    username: postgres
+    password: postgres
   jpa:
     hibernate:
       ddl-auto: update
