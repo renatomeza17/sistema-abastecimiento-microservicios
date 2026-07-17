@@ -15,7 +15,6 @@ import com.sudab.pedidodependencia.repository.PedidoDependenciaRepository;
 import com.sudab.pedidodependencia.service.CodigoGeneratorService;
 import com.sudab.pedidodependencia.service.PedidoDependenciaService;
 import feign.FeignException;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,7 +22,6 @@ import java.util.List;
 import java.util.UUID;
 
 @Service
-@RequiredArgsConstructor
 @Transactional
 public class PedidoDependenciaServiceImpl implements PedidoDependenciaService {
 
@@ -33,6 +31,20 @@ public class PedidoDependenciaServiceImpl implements PedidoDependenciaService {
     private final CodigoGeneratorService codigoGeneratorService;
     private final UsuarioClient usuarioClient;
     private final ProductoClient productoClient;
+
+    public PedidoDependenciaServiceImpl(PedidoDependenciaRepository pedidoDependenciaRepository,
+            DependenciaRepository dependenciaRepository,
+            PedidoDependenciaMapper pedidoDependenciaMapper,
+            CodigoGeneratorService codigoGeneratorService,
+            UsuarioClient usuarioClient,
+            ProductoClient productoClient) {
+        this.pedidoDependenciaRepository = pedidoDependenciaRepository;
+        this.dependenciaRepository = dependenciaRepository;
+        this.pedidoDependenciaMapper = pedidoDependenciaMapper;
+        this.codigoGeneratorService = codigoGeneratorService;
+        this.usuarioClient = usuarioClient;
+        this.productoClient = productoClient;
+    }
 
     @Override
     public PedidoDependenciaResponseDTO crear(PedidoDependenciaRequestDTO dto) {

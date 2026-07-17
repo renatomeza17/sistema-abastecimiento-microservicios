@@ -2,7 +2,6 @@ package com.sudab.pedidodependencia.service;
 
 import com.sudab.pedidodependencia.model.Contador;
 import com.sudab.pedidodependencia.repository.ContadorRepository;
-import lombok.RequiredArgsConstructor;
 import org.springframework.dao.CannotAcquireLockException;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
@@ -13,20 +12,14 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.Year;
 
 @Service
-@RequiredArgsConstructor
 public class CodigoGeneratorService {
 
     private final ContadorRepository contadorRepository;
 
-    /**
-     * Genera un codigo correlativo por anio y prefijo, ej: PED-2026-00001.
-     * Usa bloqueo pesimista sobre la fila del contador para evitar codigos
-     * duplicados ante solicitudes concurrentes. Transaccion propia y corta
-     * para no extender el bloqueo mas de lo necesario.
-     *
-     * CockroachDB usa SERIALIZABLE por defecto: bajo contencion puede
-     * abortar con un error retryable (40001), por eso @Retryable.
-     */
+    public CodigoGeneratorService(ContadorRepository contadorRepository) {
+        this.contadorRepository = contadorRepository;
+    }
+
     @Retryable(
             retryFor = CannotAcquireLockException.class,
             maxAttempts = 3,

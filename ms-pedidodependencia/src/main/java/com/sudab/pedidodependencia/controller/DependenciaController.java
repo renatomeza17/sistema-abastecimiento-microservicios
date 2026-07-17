@@ -4,7 +4,6 @@ import com.sudab.pedidodependencia.dto.request.DependenciaRequestDTO;
 import com.sudab.pedidodependencia.dto.response.DependenciaResponseDTO;
 import com.sudab.pedidodependencia.service.DependenciaService;
 import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,10 +18,13 @@ import java.util.UUID;
  */
 @RestController
 @RequestMapping("/api/dependencias")
-@RequiredArgsConstructor
 public class DependenciaController {
 
     private final DependenciaService dependenciaService;
+
+    public DependenciaController(DependenciaService dependenciaService) {
+        this.dependenciaService = dependenciaService;
+    }
 
     @PostMapping
     public ResponseEntity<DependenciaResponseDTO> crear(@Valid @RequestBody DependenciaRequestDTO dto) {
