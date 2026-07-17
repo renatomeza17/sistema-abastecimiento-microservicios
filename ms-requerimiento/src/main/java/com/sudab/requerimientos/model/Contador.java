@@ -1,8 +1,8 @@
 package com.sudab.requerimientos.model;
 
 import jakarta.persistence.*;
-import lombok.*;
 import java.io.Serializable;
+import java.util.Objects;
 
 /**
  * Tabla auxiliar para generar codigos correlativos (REQ-2026-00001,
@@ -12,17 +12,12 @@ import java.io.Serializable;
  */
 @Entity
 @Table(name = "contador")
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
 @IdClass(Contador.ContadorId.class)
 public class Contador {
 
     @Id
     @Column(nullable = false, length = 10)
-    private String prefijo; // "REQ" o "PROF"
+    private String prefijo;
 
     @Id
     @Column(nullable = false)
@@ -31,13 +26,96 @@ public class Contador {
     @Column(name = "ultimo_numero", nullable = false)
     private Integer ultimoNumero;
 
-    @Getter
-    @Setter
-    @NoArgsConstructor
-    @AllArgsConstructor
-    @EqualsAndHashCode
+    public Contador() {
+    }
+
+    public Contador(String prefijo, Integer anio, Integer ultimoNumero) {
+        this.prefijo = prefijo;
+        this.anio = anio;
+        this.ultimoNumero = ultimoNumero;
+    }
+
+    public String getPrefijo() {
+        return prefijo;
+    }
+
+    public void setPrefijo(String prefijo) {
+        this.prefijo = prefijo;
+    }
+
+    public Integer getAnio() {
+        return anio;
+    }
+
+    public void setAnio(Integer anio) {
+        this.anio = anio;
+    }
+
+    public Integer getUltimoNumero() {
+        return ultimoNumero;
+    }
+
+    public void setUltimoNumero(Integer ultimoNumero) {
+        this.ultimoNumero = ultimoNumero;
+    }
+
+    @Override
+    public String toString() {
+        return "Contador{prefijo='" + prefijo + "', anio=" + anio + ", ultimoNumero=" + ultimoNumero + "}";
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Contador contador = (Contador) o;
+        return Objects.equals(prefijo, contador.prefijo) && Objects.equals(anio, contador.anio);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(prefijo, anio);
+    }
+
     public static class ContadorId implements Serializable {
         private String prefijo;
         private Integer anio;
+
+        public ContadorId() {
+        }
+
+        public ContadorId(String prefijo, Integer anio) {
+            this.prefijo = prefijo;
+            this.anio = anio;
+        }
+
+        public String getPrefijo() {
+            return prefijo;
+        }
+
+        public void setPrefijo(String prefijo) {
+            this.prefijo = prefijo;
+        }
+
+        public Integer getAnio() {
+            return anio;
+        }
+
+        public void setAnio(Integer anio) {
+            this.anio = anio;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            ContadorId that = (ContadorId) o;
+            return Objects.equals(prefijo, that.prefijo) && Objects.equals(anio, that.anio);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(prefijo, anio);
+        }
     }
 }

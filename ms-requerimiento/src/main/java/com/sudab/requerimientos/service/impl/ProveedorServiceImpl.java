@@ -10,7 +10,6 @@ import com.sudab.requerimientos.model.Proveedor;
 import com.sudab.requerimientos.repository.ProveedorRepository;
 import com.sudab.requerimientos.service.ProveedorService;
 import feign.FeignException;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,13 +17,20 @@ import java.util.List;
 import java.util.UUID;
 
 @Service
-@RequiredArgsConstructor
 @Transactional
 public class ProveedorServiceImpl implements ProveedorService {
 
     private final ProveedorRepository proveedorRepository;
     private final ProveedorMapper proveedorMapper;
     private final UsuarioClient usuarioClient;
+
+    public ProveedorServiceImpl(ProveedorRepository proveedorRepository,
+            ProveedorMapper proveedorMapper,
+            UsuarioClient usuarioClient) {
+        this.proveedorRepository = proveedorRepository;
+        this.proveedorMapper = proveedorMapper;
+        this.usuarioClient = usuarioClient;
+    }
 
     @Override
     public ProveedorResponseDTO crear(ProveedorRequestDTO dto) {

@@ -4,7 +4,6 @@ import com.sudab.requerimientos.dto.request.ProveedorRequestDTO;
 import com.sudab.requerimientos.dto.response.ProveedorResponseDTO;
 import com.sudab.requerimientos.service.ProveedorService;
 import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,10 +13,13 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/proveedores")
-@RequiredArgsConstructor
 public class ProveedorController {
 
     private final ProveedorService proveedorService;
+
+    public ProveedorController(ProveedorService proveedorService) {
+        this.proveedorService = proveedorService;
+    }
 
     @PostMapping
     public ResponseEntity<ProveedorResponseDTO> crear(@Valid @RequestBody ProveedorRequestDTO dto) {
