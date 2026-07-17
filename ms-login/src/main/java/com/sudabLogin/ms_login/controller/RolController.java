@@ -11,15 +11,16 @@ import com.sudabLogin.ms_login.model.Rol;
 import com.sudabLogin.ms_login.model.Usuario;
 import com.sudabLogin.ms_login.service.RolService;
 
-import lombok.RequiredArgsConstructor;
-
 @RestController
 @RequestMapping("/api/roles")
 @CrossOrigin(origins = "*")
-@RequiredArgsConstructor
 public class RolController {
 
     private final RolService rolService;
+
+    public RolController(RolService rolService) {
+        this.rolService = rolService;
+    }
 
     // HU02 - Listar los roles disponibles (JEFE, DIRECTOR, APOYO)
     @GetMapping

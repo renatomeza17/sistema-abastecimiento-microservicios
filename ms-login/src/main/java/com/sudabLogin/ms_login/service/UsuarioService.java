@@ -8,14 +8,17 @@ import com.sudabLogin.ms_login.model.Usuario;
 import com.sudabLogin.ms_login.repository.UsuarioRepository;
 
 import jakarta.persistence.EntityNotFoundException;
-import lombok.RequiredArgsConstructor;
 
 @Service
-@RequiredArgsConstructor
 public class UsuarioService {
 
     private final UsuarioRepository usuarioRepository;
     private final PasswordEncoder passwordEncoder;
+
+    public UsuarioService(UsuarioRepository usuarioRepository, PasswordEncoder passwordEncoder) {
+        this.usuarioRepository = usuarioRepository;
+        this.passwordEncoder = passwordEncoder;
+    }
 
     public Usuario registrar(RegistrarUsuarioDTO request) {
         if (usuarioRepository.existsByUsername(request.getUsername())) {

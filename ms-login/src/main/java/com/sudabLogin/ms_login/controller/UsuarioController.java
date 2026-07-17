@@ -9,15 +9,17 @@ import com.sudabLogin.ms_login.model.Usuario;
 import com.sudabLogin.ms_login.service.UsuarioService;
 
 import jakarta.persistence.EntityNotFoundException;
-import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("/api/usuarios")
 @CrossOrigin(origins = "*")
-@RequiredArgsConstructor
 public class UsuarioController {
 
     private final UsuarioService usuarioService;
+
+    public UsuarioController(UsuarioService usuarioService) {
+        this.usuarioService = usuarioService;
+    }
 
     @PostMapping
     public ResponseEntity<?> registrar(@RequestBody RegistrarUsuarioDTO request) {

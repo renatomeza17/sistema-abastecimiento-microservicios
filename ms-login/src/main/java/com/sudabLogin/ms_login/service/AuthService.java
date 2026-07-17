@@ -12,15 +12,18 @@ import com.sudabLogin.ms_login.model.Rol;
 import com.sudabLogin.ms_login.model.Usuario;
 import com.sudabLogin.ms_login.repository.UsuarioRepository;
 
-import lombok.RequiredArgsConstructor;
-
 @Service
-@RequiredArgsConstructor
 public class AuthService {
 
     private final UsuarioRepository usuarioRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
+
+    public AuthService(UsuarioRepository usuarioRepository, PasswordEncoder passwordEncoder, JwtUtil jwtUtil) {
+        this.usuarioRepository = usuarioRepository;
+        this.passwordEncoder = passwordEncoder;
+        this.jwtUtil = jwtUtil;
+    }
 
     public LoginResponseDTO login(LoginRequestDTO request) {
         Usuario usuario = usuarioRepository.findByUsername(request.getUsername())
