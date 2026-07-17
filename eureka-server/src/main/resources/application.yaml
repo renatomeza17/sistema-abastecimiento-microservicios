@@ -4,12 +4,12 @@ spring:
   application:
     name: eureka-server
   config:
-    import: ${SPRING_CONFIG_IMPORT:optional:configserver:http://localhost:8888}
+    import: ${SPRING_CONFIG_IMPORT:optional:configserver:http://config-server:8888}
 eureka:
   instance:
-    hostname: localhost
+    hostname: eureka-server
   client:
     register-with-eureka: false
     fetch-registry: false
     service-url:
-      defaultZone: http://localhost:${server.port}/eureka/
+      defaultZone: http://eureka-server:${server.port}/eureka/
