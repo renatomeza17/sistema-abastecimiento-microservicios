@@ -20,27 +20,24 @@ import com.sudabKardex.ms_kardex.DTO.Producto.ProductoResponseDTO;
 import com.sudabKardex.ms_kardex.Model.Kardex;
 import com.sudabKardex.ms_kardex.Service.KardexService;
 
-import lombok.RequiredArgsConstructor;
-
 @RestController
 @RequestMapping("/api/kardex")
 @CrossOrigin(origins = "*")
-@RequiredArgsConstructor
 public class KardexController {
 
     private final KardexService kardexService;
-    
+
+    public KardexController(KardexService kardexService) {
+        this.kardexService = kardexService;
+    }
 
     @PostMapping("/nuevo-asiento")  
     public ResponseEntity<Kardex> crearAsiento(@RequestBody KardexRequestDTO dto) {
         return new ResponseEntity<>(kardexService.registrarNuevoAsiento(dto), HttpStatus.CREATED);
     }
 
-  
-
     @GetMapping("/productos-disponibles")
     public ResponseEntity<List<ProductoResponseDTO>> obtenerProductosSinKardex() {
-        // Te servirá para llenar el combobox/select en el formulario de la HU11 en Angular
         return ResponseEntity.ok(kardexService.obtenerProductosDisponibles());
     }
 
@@ -54,7 +51,6 @@ public class KardexController {
         return ResponseEntity.ok(kardexService.obtenerMovimientosPorKardex(idKardex));
     }
 
-    
     @PostMapping("/movimiento")
     public ResponseEntity<String> crearMovimientoManual(@RequestBody KardexMovimientoRequestDTO request) {
         kardexService.registrarMovimiento(
@@ -64,7 +60,7 @@ public class KardexController {
             request.getDocumentoReferencia(),
             request.getObservaciones()
         );
-        return ResponseEntity.ok("✅ Movimiento registrado y stock actualizado con éxito en Neon DB.");
+        return ResponseEntity.ok("Movimiento registrado y stock actualizado con exito en Neon DB.");
     }
 
     @GetMapping("/verificar-faltantes/{idOrden}")
@@ -72,8 +68,4 @@ public class KardexController {
         List<ProductoResponseDTO> faltantes = kardexService.verificarProductosFaltantesDeOrden(idOrden);
         return ResponseEntity.ok(faltantes);
     }
-
-
-
 }
-

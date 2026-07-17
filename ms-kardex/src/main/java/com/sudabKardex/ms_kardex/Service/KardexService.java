@@ -24,36 +24,34 @@ import com.sudabKardex.ms_kardex.Repository.ProductoRepository;
 
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
-import lombok.RequiredArgsConstructor;
 
 @Service
-@RequiredArgsConstructor
 public class KardexService {
 
     private final KardexRepository kardexRepository;
     private final KardexMovimientoRepository movimientoRepository;
     private final ProductoRepository productoRepository;
-    // private final ProductoRepository productoRepository; 
-    // private final OrdenCompraRepository ordenCompraRepository;
-
-    // private final ProductoClient productoClient;
     private final OrdenClient ordenClient;
 
-    // --- LOGICA PARA HU11: CREAR NUEVO ASIENTO (PRODUCTO NUEVO) ---
+    public KardexService(KardexRepository kardexRepository, KardexMovimientoRepository movimientoRepository, ProductoRepository productoRepository, OrdenClient ordenClient) {
+        this.kardexRepository = kardexRepository;
+        this.movimientoRepository = movimientoRepository;
+        this.productoRepository = productoRepository;
+        this.ordenClient = ordenClient;
+    }
+
     @Transactional
     public Kardex registrarNuevoAsiento(KardexRequestDTO dto) {
         Producto prod = productoRepository.findById(dto.getIdProducto())
                     .orElseThrow(() -> new EntityNotFoundException("Producto no registrado en el catálogo maestro institucional."));
 
-            // Validar que no tenga ya un Kárdex abierto
             if (kardexRepository.findByProducto_IdProducto(dto.getIdProducto()).isPresent()) {
                 throw new IllegalStateException("El producto ya cuenta con una ficha de Kárdex activa.");
             }
 
-            // Crear cabecera de Kárdex
             Kardex nuevoKardex = new Kardex();
             nuevoKardex.setProducto(prod);
-            nuevoKardex.setStockActual(0); // Nace en cero hasta que entre una OC conforme
+            nuevoKardex.setStockActual(0);
             nuevoKardex.setStockMinimo(dto.getStockMinimo());
             nuevoKardex.setUbicacionAlmacen(dto.getUbicacionAlmacen());
             nuevoKardex.setFechaApertura(LocalDate.now());
@@ -62,11 +60,6 @@ public class KardexService {
             return kardexRepository.save(nuevoKardex);
     }
 
-
-
-
-
-    // --- LOGICA PARA HU10: ACTUALIZACIÓN AUTOMÁTICA (ENTRADAS / SALIDAS) ---
     @Transactional
     public void registrarMovimiento(Long idProducto, Integer cantidad, String tipo, String docReferencia, String obs) {
         Kardex kardex = kardexRepository.findByProducto_IdProducto(idProducto)
@@ -97,15 +90,13 @@ public class KardexService {
         movimientoRepository.save(movimiento);
     }
 
-
-    @Transactional //(readOnly = true)
+    @Transactional
     public List<KardexResponseDTO> listarTodoElKardex() {
         return kardexRepository.findAll().stream().map(k -> {
             KardexResponseDTO dto = new KardexResponseDTO();
             dto.setIdKardex(k.getIdKardex());
             dto.setIdProducto(k.getProducto().getIdProducto());
             
-            // 3. SOLUCIÓN AL CONVERTIR A DTO: Jalar datos descriptivos del Producto local
             productoRepository.findById(k.getProducto().getIdProducto()).ifPresent(p -> {
                 dto.setCodigoProducto(p.getCodigo()); 
                 dto.setNombreProducto(p.getNombre());
@@ -121,8 +112,7 @@ public class KardexService {
         }).collect(Collectors.toList());
     }
 
-
-    @Transactional //(readOnly = true)
+    @Transactional
     public List<KardexMovimientoResponseDTO> obtenerMovimientosPorKardex(Long idKardex) {
         return movimientoRepository.findByKardexIdKardexOrderByFechaMovimientoDesc(idKardex).stream().map(m -> {
             KardexMovimientoResponseDTO dto = new KardexMovimientoResponseDTO();
@@ -138,7 +128,6 @@ public class KardexService {
         }).collect(Collectors.toList());
     }
 
-
     public List<ProductoResponseDTO> obtenerProductosDisponibles() {
         List<Long> idsConKardex = kardexRepository.findAll().stream()
                 .map(kardex -> kardex.getProducto().getIdProducto())
@@ -151,21 +140,17 @@ public class KardexService {
             productosLocales = productoRepository.findByIdProductoNotIn(idsConKardex);
         }
 
-        // Transformación limpia usando la referencia al método privado de abajo
         return productosLocales.stream()
                 .map(this::convertirAProductoDTO)
                 .collect(Collectors.toList());
     }
 
-
     public List<ProductoResponseDTO> verificarProductosFaltantesDeOrden(Long idOrden) {
-        // Buscamos de forma segura la Orden de Compra remota vía OpenFeign
         OrdenResponseDTO orden = ordenClient.obtenerOrdenPorId(idOrden);
         if (orden == null) {
             throw new EntityNotFoundException("Orden de compra no registrada con el ID: " + idOrden);
         }
 
-        // Filtramos los productos de la orden que no existen en tu Kárdex local
         List<Producto> productosFaltantes = orden.getDetalles().stream()
                 .filter(detalle -> !kardexRepository.existsByProductoIdProducto(detalle.getProductoId()))
                 .map(detalle -> productoRepository.findById(detalle.getProductoId()).orElse(null))
@@ -173,12 +158,10 @@ public class KardexService {
                 .distinct()
                 .toList();
 
-        // Reutilizamos el mismo método helper de mapeo
         return productosFaltantes.stream()
                 .map(this::convertirAProductoDTO)
                 .collect(Collectors.toList());
     }
-
 
     private ProductoResponseDTO convertirAProductoDTO(Producto p) {
         ProductoResponseDTO dto = new ProductoResponseDTO();
@@ -188,20 +171,4 @@ public class KardexService {
         dto.setUnidadMedida(p.getUnidadMedida());
         return dto;
     }
-
-
-    // public List<Producto> obtenerProductos() {
-    //     return productoRepository.findAll();
-    // }
-
-
-
-    
-
-
-
-
-
-
 }
-

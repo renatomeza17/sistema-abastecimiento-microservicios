@@ -10,15 +10,17 @@ import com.sudabKardex.ms_kardex.DTO.Producto.ProductoResponseDTO;
 import com.sudabKardex.ms_kardex.Service.ProductoService;
 
 import jakarta.persistence.EntityNotFoundException;
-import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("/api/productos")
 @CrossOrigin(origins = "*")
-@RequiredArgsConstructor
 public class ProductoController {
 
     private final ProductoService productoService;
+
+    public ProductoController(ProductoService productoService) {
+        this.productoService = productoService;
+    }
 
     @GetMapping
     public ResponseEntity<List<ProductoResponseDTO>> obtenerCatalogo() {

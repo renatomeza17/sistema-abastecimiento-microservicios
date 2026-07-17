@@ -11,13 +11,15 @@ import com.sudabKardex.ms_kardex.Model.Producto;
 import com.sudabKardex.ms_kardex.Repository.ProductoRepository;
 
 import jakarta.persistence.EntityNotFoundException;
-import lombok.RequiredArgsConstructor;
 
 @Service
-@RequiredArgsConstructor
 public class ProductoService {
 
     private final ProductoRepository productoRepository;
+
+    public ProductoService(ProductoRepository productoRepository) {
+        this.productoRepository = productoRepository;
+    }
 
     @Transactional(readOnly = true)
     public List<ProductoResponseDTO> listarProductosActivos() {
