@@ -20,16 +20,17 @@ import com.sudabOrdenes.ms_ordenes.DTO.OrdenRequestDTO;
 import com.sudabOrdenes.ms_ordenes.DTO.OrdenResponseDTO;
 import com.sudabOrdenes.ms_ordenes.Service.OrdenService;
 
-import lombok.RequiredArgsConstructor;
-
 
 @RestController
 @RequestMapping("/api/ordenes")
 @CrossOrigin(origins = "*")
-@RequiredArgsConstructor
 public class OrdenController {
 
      private final OrdenService ordenService;
+
+    public OrdenController(OrdenService ordenService) {
+        this.ordenService = ordenService;
+    }
 
     
     @PostMapping
@@ -111,7 +112,6 @@ public class OrdenController {
     }
 
   
-
 
 
 }
