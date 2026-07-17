@@ -1,0 +1,2 @@
+CREATE ROLE modulo4 WITH LOGIN PASSWORD 'modulo4';
+CREATE SEQUENCE IF NOT EXISTS requerimiento_id_seq;
