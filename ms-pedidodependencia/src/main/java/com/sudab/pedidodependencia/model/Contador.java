@@ -90,13 +90,12 @@ public class Contador {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Contador contador = (Contador) o;
-        return Objects.equals(prefijo, contador.prefijo) && Objects.equals(anio, contador.anio)
-                && Objects.equals(ultimoNumero, contador.ultimoNumero);
+        return Objects.equals(prefijo, contador.prefijo) && Objects.equals(anio, contador.anio);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(prefijo, anio, ultimoNumero);
+        return Objects.hash(prefijo, anio);
     }
 
     @Override

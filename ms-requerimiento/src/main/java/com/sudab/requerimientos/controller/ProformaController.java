@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
+@RequestMapping("/api")
 public class ProformaController {
 
     private final ProformaService proformaService;
@@ -22,7 +23,7 @@ public class ProformaController {
         this.proformaService = proformaService;
     }
 
-    @PostMapping("/api/requerimientos/{idRequerimiento}/proformas")
+    @PostMapping("/requerimientos/{idRequerimiento}/proformas")
     public ResponseEntity<ProformaResponseDTO> cotizar(
             @PathVariable UUID idRequerimiento,
             @Valid @RequestBody ProformaRequestDTO dto) {
@@ -30,20 +31,20 @@ public class ProformaController {
         return ResponseEntity.status(HttpStatus.CREATED).body(creada);
     }
 
-    @GetMapping("/api/requerimientos/{idRequerimiento}/proformas")
+    @GetMapping("/requerimientos/{idRequerimiento}/proformas")
     public ResponseEntity<List<ProformaResponseDTO>> listarPorRequerimiento(
             @PathVariable UUID idRequerimiento) {
         return ResponseEntity.ok(proformaService.listarPorRequerimiento(idRequerimiento));
     }
 
-    @GetMapping("/api/usuarios/{idUsuario}/proformas")
+    @GetMapping("/usuarios/{idUsuario}/proformas")
     public ResponseEntity<List<ProformaResponseDTO>> listarPorUsuario(
             @PathVariable Long idUsuario,
             @RequestParam(required = false) EstadoProforma estado) {
         return ResponseEntity.ok(proformaService.listarPorUsuario(idUsuario, estado));
     }
 
-    @GetMapping("/api/proformas/{id}")
+    @GetMapping("/proformas/{id}")
     public ResponseEntity<ProformaResponseDTO> obtenerPorId(@PathVariable UUID id) {
         return ResponseEntity.ok(proformaService.obtenerPorId(id));
     }
