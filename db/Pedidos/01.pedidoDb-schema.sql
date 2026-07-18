@@ -33,7 +33,7 @@ CREATE TABLE detalle_pedido_dependencia (
 
 CREATE TABLE contador (
     prefijo VARCHAR(10) NOT NULL,
-    anio INT NOT NULL,
+    anio INT4 NOT NULL,
     ultimo_numero INT NOT NULL,
     PRIMARY KEY (prefijo, anio)
 );

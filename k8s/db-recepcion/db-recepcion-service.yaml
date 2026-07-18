@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: db-recepcion
+  labels:
+    app: db-recepcion
+spec:
+  type: ClusterIP
+  selector:
+    app: db-recepcion
+  ports:
+    - name: postgres
+      port: 5432
+      targetPort: 5432

@@ -6,87 +6,85 @@ spring:
     name: ms-gateway
   cloud:
     gateway:
-      server:
-        webflux:
-          default-filters:
-            - AddRequestHeader=X-Gateway-Request, true
-          discovery:
-            locator:
-              enabled: true
-          routes:
-            - id: ordenes
-              uri: lb://MS-ORDENES
-              predicates:
-                - Path=/orden/**
-              filters:
-                - RewritePath=/orden/(?<segment>.*), /api/ordenes/${segment}
-            - id: requerimiento
-              uri: lb://MS-REQUERIMIENTO
-              predicates:
-                - Path=/requerimiento/**
-              filters:
-                - RewritePath=/requerimiento/(?<segment>.*), /api/requerimientos/${segment}
-            - id: recepcion
-              uri: lb://MS-RECEPCION
-              predicates:
-                - Path=/recepcion/**
-              filters:
-                - RewritePath=/recepcion/(?<segment>.*), /api/pedidos-pendientes/${segment}
-            - id: pedidodependencia
-              uri: lb://MS-PEDIDODEPENDENCIA
-              predicates:
-                - Path=/pedidodependencia/**
-              filters:
-                - RewritePath=/pedidodependencia/(?<segment>.*), /api/dependencias/${segment}
-            - id: login
-              uri: lb://MS-LOGIN
-              predicates:
-                - Path=/login/**
-              filters:
-                - RewritePath=/login/(?<segment>.*), /api/login/${segment}
-            - id: login-base
-              uri: lb://MS-LOGIN
-              predicates:
-                - Path=/login
-              filters:
-                - RewritePath=/login, /api/login
-            - id: roles
-              uri: lb://MS-LOGIN
-              predicates:
-                - Path=/roles/**
-              filters:
-                - RewritePath=/roles/(?<segment>.*), /api/roles/${segment}
-            - id: roles-base
-              uri: lb://MS-LOGIN
-              predicates:
-                - Path=/roles
-              filters:
-                - RewritePath=/roles, /api/roles
-            - id: usuarios
-              uri: lb://MS-LOGIN
-              predicates:
-                - Path=/usuarios/**
-              filters:
-                - RewritePath=/usuarios/(?<segment>.*), /api/usuarios/${segment}
-            - id: usuarios-base
-              uri: lb://MS-LOGIN
-              predicates:
-                - Path=/usuarios
-              filters:
-                - RewritePath=/usuarios, /api/usuarios
+      default-filters:
+        - AddRequestHeader=X-Gateway-Request, true
+      discovery:
+        locator:
+          enabled: true
+      routes:
+        - id: ordenes
+          uri: lb://ms-ordenes
+          predicates:
+            - Path=/orden/**
+          filters:
+            - RewritePath=/orden/(?<segment>.*), /api/ordenes/${segment}
+        - id: requerimiento
+          uri: lb://ms-requerimiento
+          predicates:
+            - Path=/requerimiento/**
+          filters:
+            - RewritePath=/requerimiento/(?<segment>.*), /api/requerimientos/${segment}
+        - id: recepcion
+          uri: lb://ms-recepcion
+          predicates:
+            - Path=/recepcion/**
+          filters:
+            - RewritePath=/recepcion/(?<segment>.*), /api/pedidos-pendientes/${segment}
+        - id: pedidodependencia
+          uri: lb://ms-pedidodependencia
+          predicates:
+            - Path=/pedidodependencia/**
+          filters:
+            - RewritePath=/pedidodependencia/(?<segment>.*), /api/dependencias/${segment}
+        - id: login
+          uri: lb://ms-login
+          predicates:
+            - Path=/login/**
+          filters:
+            - RewritePath=/login/(?<segment>.*), /api/login/${segment}
+        - id: login-base
+          uri: lb://ms-login
+          predicates:
+            - Path=/login
+          filters:
+            - RewritePath=/login, /api/login
+        - id: roles
+          uri: lb://ms-login
+          predicates:
+            - Path=/roles/**
+          filters:
+            - RewritePath=/roles/(?<segment>.*), /api/roles/${segment}
+        - id: roles-base
+          uri: lb://ms-login
+          predicates:
+            - Path=/roles
+          filters:
+            - RewritePath=/roles, /api/roles
+        - id: usuarios
+          uri: lb://ms-login
+          predicates:
+            - Path=/usuarios/**
+          filters:
+            - RewritePath=/usuarios/(?<segment>.*), /api/usuarios/${segment}
+        - id: usuarios-base
+          uri: lb://ms-login
+          predicates:
+            - Path=/usuarios
+          filters:
+            - RewritePath=/usuarios, /api/usuarios
 
-            - id: kardex
-              uri: lb://MS-KARDEX
-              predicates:
-                - Path=/kardex/**
-              filters:
-                - RewritePath=/kardex/(?<segment>.*), /api/kardex/${segment}
-            - id: productos
-              uri: lb://MS-KARDEX
-              predicates:
-                - Path=/productos/**
-              filters:
-                - RewritePath=/productos/(?<segment>.*), /api/productos/${segment}
+        - id: kardex
+          uri: lb://ms-kardex
+          predicates:
+            - Path=/kardex/**
+          filters:
+            - RewritePath=/kardex/(?<segment>.*), /api/kardex/${segment}
+        - id: productos
+          uri: lb://ms-kardex
+          predicates:
+            - Path=/productos/**
+          filters:
+            - RewritePath=/productos/(?<segment>.*), /api/productos/${segment}
 
 eureka:
   instance:

@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: db-ordenes
+  labels:
+    app: db-ordenes
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: db-ordenes
+  template:
+    metadata:
+      labels:
+        app: db-ordenes
+    spec:
+      containers:
+        - name: db-ordenes
+          image: mysql:8.0
+          envFrom:
+            - secretRef:
+                name: db-ordenes-secret
+          ports:
+            - containerPort: 3306
+          volumeMounts:
+            - name: db-ordenes-storage
+              mountPath: /var/lib/mysql
+          readinessProbe:
+            exec:
+              command: ["mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p$(MYSQL_ROOT_PASSWORD)"]
+            initialDelaySeconds: 15
+            periodSeconds: 10
+          livenessProbe:
+            exec:
+              command: ["mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p$(MYSQL_ROOT_PASSWORD)"]
+            initialDelaySeconds: 30
+            periodSeconds: 10
+      volumes:
+        - name: db-ordenes-storage
+          persistentVolumeClaim:
+            claimName: db-ordenes-pvc
+      restartPolicy: Always

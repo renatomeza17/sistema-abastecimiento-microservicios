@@ -4,8 +4,6 @@ server:
 spring:
   application:
     name: ms-kardex
-  config:
-    import: ${SPRING_CONFIG_IMPORT:optional:configserver:http://localhost:8888}
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://mysql-kardex:3306/kardexDb

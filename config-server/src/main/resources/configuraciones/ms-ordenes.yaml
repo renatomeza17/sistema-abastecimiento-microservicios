@@ -4,8 +4,7 @@ server:
 spring:
   application:
     name: ms-ordenes
-  config:
-    import: ${SPRING_CONFIG_IMPORT:optional:configserver:http://config-server:8888}
+  
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://mysql-ordenes:3306/ordenesDb
@@ -32,3 +31,7 @@ eureka:
       defaultZone: ${EUREKA_CLIENT_SERVICEURL_DEFAULTZONE:http://eureka-server:8761/eureka/}
     register-with-eureka: true
     fetch-registry: true
+
+
+
+

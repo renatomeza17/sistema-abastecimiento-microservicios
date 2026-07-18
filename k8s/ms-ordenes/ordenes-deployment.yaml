@@ -1,0 +1,68 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ms-ordenes
+  labels:
+    app: ms-ordenes
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ms-ordenes
+  template:
+    metadata:
+      labels:
+        app: ms-ordenes
+    spec:
+      initContainers:
+        - name: wait-for-services
+          image: busybox:1.36
+          command:
+            - sh
+            - -c
+            - |
+              until nc -z -w 2 config-server 8888 && nc -z -w 2 eureka-server 8761 && nc -z -w 2 db-ordenes 3306; do
+                echo "Esperando a config-server, eureka-server y db-ordenes..."
+                sleep 2
+              done
+      containers:
+        - name: ms-ordenes
+          image: ms-ordenes
+          imagePullPolicy: IfNotPresent
+          envFrom:
+            - configMapRef:
+                name: ms-ordenes-config
+            - secretRef:
+                name: ms-ordenes-secret
+          env:
+            - name: JAVA_TOOL_OPTIONS
+              value: "-Deureka.client.serviceUrl.defaultZone=http://eureka-server:8761/eureka/ -Dserver.port=8082 -Dspring.cloud.config.override-system-properties=true -Dspring.cloud.config.allow-override=true"
+            - name: SPRING_DATASOURCE_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: db-ordenes-secret
+                  key: MYSQL_USER
+            - name: SPRING_DATASOURCE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: db-ordenes-secret
+                  key: MYSQL_PASSWORD
+          ports:
+            - containerPort: 8082
+          startupProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8082
+            failureThreshold: 30
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8082
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8082
+            periodSeconds: 15
+      restartPolicy: Always

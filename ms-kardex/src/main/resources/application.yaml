@@ -1,34 +1,36 @@
-server:
-  port: 8087
+# server:
+#   port: 8087
 
 spring:
   application:
     name: ms-kardex
   config:
     import: ${SPRING_CONFIG_IMPORT:optional:configserver:http://config-server:8888}
-  datasource:
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://mysql-kardex:3306/kardexDb
-    username: root
-    password: root
-    hikari:
-      maximum-pool-size: 3
-      minimum-idle: 1
-      idle-timeout: 30000
-      max-lifetime: 270000
-      connection-timeout: 20000
 
-  jpa:
-    database-platform: org.hibernate.dialect.MySQLDialect
-    show-sql: true
-    hibernate:
-      ddl-auto: update
+    
+#   datasource:
+#     driver-class-name: com.mysql.cj.jdbc.Driver
+#     url: ${KARDEX_DB_URL}
+#     username: ${KARDEX_DB_USERNAME}
+#     password: ${KARDEX_DB_PASSWORD}
+#     hikari:
+#       maximum-pool-size: 3
+#       minimum-idle: 1
+#       idle-timeout: 30000
+#       max-lifetime: 270000
+#       connection-timeout: 20000
+      
+#   jpa:
+#     database-platform: org.hibernate.dialect.MySQLDialect
+#     show-sql: true
+#     hibernate:
+#       ddl-auto: update
 
-springdoc:
-  swagger-ui:
-    path: /docs
+# springdoc:
+#   swagger-ui:
+#     path: /docs
 
-eureka:
-  client:
-    service-url:
-      defaultZone: ${EUREKA_CLIENT_SERVICEURL_DEFAULTZONE:http://eureka-server:8761/eureka/}
+# eureka:
+#   client:
+#     service-url:
+#       defaultZone: ${EUREKA_CLIENT_SERVICEURL_DEFAULTZONE:http://eureka-server:8761/eureka/}

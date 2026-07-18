@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: db-recepcion
+  labels:
+    app: db-recepcion
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: db-recepcion
+  template:
+    metadata:
+      labels:
+        app: db-recepcion
+    spec:
+      containers:
+        - name: db-recepcion
+          image: postgres:16-alpine
+          envFrom:
+            - secretRef:
+                name: db-recepcion-secret
+          ports:
+            - containerPort: 5432
+          volumeMounts:
+            - name: db-recepcion-storage
+              mountPath: /var/lib/postgresql/data
+              subPath: postgres
+          readinessProbe:
+            exec:
+              command: ["pg_isready", "-U", "$(POSTGRES_USER)"]
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          livenessProbe:
+            exec:
+              command: ["pg_isready", "-U", "$(POSTGRES_USER)"]
+            initialDelaySeconds: 10
+            periodSeconds: 10
+      volumes:
+        - name: db-recepcion-storage
+          persistentVolumeClaim:
+            claimName: db-recepcion-pvc
+      restartPolicy: Always

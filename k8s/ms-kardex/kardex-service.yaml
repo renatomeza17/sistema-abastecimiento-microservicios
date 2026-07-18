@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: ms-kardex
+  labels:
+    app: ms-kardex
+spec:
+  type: ClusterIP
+  selector:
+    app: ms-kardex
+  ports:
+    - name: http
+      port: 8080
+      targetPort: 8087

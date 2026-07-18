@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: db-login
+  labels:
+    app: db-login
+spec:
+  type: ClusterIP
+  selector:
+    app: db-login
+  ports:
+    - name: postgres
+      port: 5432
+      targetPort: 5432
