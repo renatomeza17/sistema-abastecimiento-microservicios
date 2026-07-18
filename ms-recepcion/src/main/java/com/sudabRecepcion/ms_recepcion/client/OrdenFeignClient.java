@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.PathVariable;
  
 import com.sudabRecepcion.ms_recepcion.dto.OrdenResponseDTO;
  
-@FeignClient(name = "MS-ORDENES", url = "${ms-ordenes.url:http://localhost:8082}")
+@FeignClient(name = "MS-ORDENES")
 public interface OrdenFeignClient {
  
     @GetMapping("/api/ordenes/{id}")
