@@ -1,0 +1,68 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ms-kardex
+  labels:
+    app: ms-kardex
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ms-kardex
+  template:
+    metadata:
+      labels:
+        app: ms-kardex
+    spec:
+      initContainers:
+        - name: wait-for-services
+          image: busybox:1.36
+          command:
+            - sh
+            - -c
+            - |
+              until nc -z -w 2 config-server 8888 && nc -z -w 2 eureka-server 8761 && nc -z -w 2 db-kardex 3306; do
+                echo "Esperando a config-server, eureka-server y db-kardex..."
+                sleep 2
+              done
+      containers:
+        - name: ms-kardex
+          image: ms-kardex
+          imagePullPolicy: IfNotPresent
+          envFrom:
+            - configMapRef:
+                name: ms-kardex-config
+            - secretRef:
+                name: ms-kardex-secret
+          env:
+            - name: JAVA_TOOL_OPTIONS
+              value: "-Deureka.client.service-url.defaultZone=http://eureka-server:8761/eureka/ -Dspring.config.import=optional:configserver:http://config-server:8888"
+            - name: SPRING_DATASOURCE_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: db-kardex-secret
+                  key: MYSQL_USER
+            - name: SPRING_DATASOURCE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: db-kardex-secret
+                  key: MYSQL_PASSWORD
+          ports:
+            - containerPort: 8087
+          startupProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8087
+            failureThreshold: 30
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8087
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8087
+            periodSeconds: 15
+      restartPolicy: Always

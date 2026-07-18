@@ -25,10 +25,10 @@ public class Contador {
     private String prefijo; // "REQ" o "PROF"
 
     @Id
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "int4")
     private Integer anio;
 
-    @Column(name = "ultimo_numero", nullable = false)
+    @Column(name = "ultimo_numero", nullable = false, columnDefinition = "int4")
     private Integer ultimoNumero;
 
     @Getter

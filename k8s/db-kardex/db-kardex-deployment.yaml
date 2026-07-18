@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: db-kardex
+  labels:
+    app: db-kardex
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: db-kardex
+  template:
+    metadata:
+      labels:
+        app: db-kardex
+    spec:
+      containers:
+        - name: db-kardex
+          image: mysql:8.0
+          envFrom:
+            - secretRef:
+                name: db-kardex-secret
+          ports:
+            - containerPort: 3306
+          volumeMounts:
+            - name: db-kardex-storage
+              mountPath: /var/lib/mysql
+          readinessProbe:
+            exec:
+              command: ["mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p$(MYSQL_ROOT_PASSWORD)"]
+            initialDelaySeconds: 15
+            periodSeconds: 10
+          livenessProbe:
+            exec:
+              command: ["mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p$(MYSQL_ROOT_PASSWORD)"]
+            initialDelaySeconds: 30
+            periodSeconds: 10
+      volumes:
+        - name: db-kardex-storage
+          persistentVolumeClaim:
+            claimName: db-kardex-pvc
+      restartPolicy: Always

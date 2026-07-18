@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: db-kardex
+  labels:
+    app: db-kardex
+spec:
+  type: ClusterIP
+  selector:
+    app: db-kardex
+  ports:
+    - name: mysql
+      port: 3306
+      targetPort: 3306

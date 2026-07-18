@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ms-pedidodependencia-config
+data:
+  EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: "http://eureka-server:8761/eureka/"
+  EUREKA_URI: "http://eureka-server:8761/eureka"
+  SPRING_CONFIG_IMPORT: "optional:configserver:http://config-server:8888"
+  SPRING_DATASOURCE_URL: "jdbc:postgresql://db-pedidodependencia:26257/pedidodependenciadb?sslmode=disable&options=-c%20default_int_size=4"
+  SPRING_DATASOURCE_USERNAME: "root"
+  SPRING_DATASOURCE_DRIVER_CLASS_NAME: "org.postgresql.Driver"
+  SPRING_CLOUD_CONFIG_OVERRIDE_SYSTEM_PROPERTIES: "false"

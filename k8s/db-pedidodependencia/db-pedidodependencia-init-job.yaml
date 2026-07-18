@@ -1,0 +1,18 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: db-pedidodependencia-init
+spec:
+  template:
+    spec:
+      containers:
+        - name: db-pedidodependencia-init
+          image: cockroachdb/cockroach:v23.2.6
+          command:
+            - "/cockroach/cockroach"
+            - "sql"
+            - "--insecure"
+            - "--host=db-pedidodependencia:26257"
+            - "--execute=CREATE DATABASE IF NOT EXISTS pedidodependenciadb;"
+      restartPolicy: OnFailure
+  backoffLimit: 5

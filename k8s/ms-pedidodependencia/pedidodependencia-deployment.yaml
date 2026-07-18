@@ -1,0 +1,56 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ms-pedidodependencia
+  labels:
+    app: ms-pedidodependencia
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ms-pedidodependencia
+  template:
+    metadata:
+      labels:
+        app: ms-pedidodependencia
+    spec:
+      initContainers:
+        - name: wait-for-services
+          image: busybox:1.36
+          command:
+            - sh
+            - -c
+            - |
+              until nc -z -w 2 config-server 8888 && nc -z -w 2 eureka-server 8761 && nc -z -w 2 db-pedidodependencia 26257; do
+                echo "Esperando a config-server, eureka-server y db-pedidodependencia..."
+                sleep 2
+              done
+      containers:
+        - name: ms-pedidodependencia
+          image: ms-pedidodependencia
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: JAVA_TOOL_OPTIONS
+              value: "-Deureka.client.service-url.defaultZone=http://eureka-server:8761/eureka/ -Dspring.config.import=optional:configserver:http://config-server:8888"
+          envFrom:
+            - configMapRef:
+                name: ms-pedidodependencia-config 
+          ports:
+            - containerPort: 8084
+          startupProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8084
+            failureThreshold: 30
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8084
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8084
+            periodSeconds: 15
+      restartPolicy: Always

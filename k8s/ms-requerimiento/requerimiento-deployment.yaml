@@ -1,0 +1,60 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ms-requerimiento
+  labels:
+    app: ms-requerimiento
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ms-requerimiento
+  template:
+    metadata:
+      labels:
+        app: ms-requerimiento
+    spec:
+      initContainers:
+        - name: wait-for-services
+          image: busybox:1.36
+          command:
+            - sh
+            - -c
+            - |
+              until nc -z -w 2 config-server 8888 && nc -z -w 2 eureka-server 8761 && nc -z -w 2 db-requerimiento 26257; do
+                echo "Esperando a config-server, eureka-server y db-requerimiento..."
+                sleep 2
+              done
+      containers:
+        - name: ms-requerimiento
+          image: ms-requerimiento
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: JAVA_TOOL_OPTIONS
+              value: "-Deureka.client.service-url.defaultZone=http://eureka-server:8761/eureka/ -Dspring.config.import=optional:configserver:http://config-server:8888"
+            - name: SPRING_CLOUD_CONFIG_OVERRIDE_SYSTEM_PROPERTIES
+              value: "true"
+            - name: SPRING_CLOUD_CONFIG_ALLOW_OVERRIDE
+              value: "true"
+          envFrom:
+            - configMapRef:
+                name: ms-requerimiento-config
+          ports:
+            - containerPort: 8083
+          startupProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8083
+            failureThreshold: 30
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8083
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8083
+            periodSeconds: 15
+      restartPolicy: Always

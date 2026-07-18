@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: db-requerimiento
+  labels:
+    app: db-requerimiento
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: db-requerimiento
+  template:
+    metadata:
+      labels:
+        app: db-requerimiento
+    spec:
+      containers:
+        - name: db-requerimiento
+          image: cockroachdb/cockroach:v23.2.6
+          args:
+            - "start-single-node"
+            - "--insecure"
+            # - "--http-addr=:8080"
+            - "--listen-addr=:26257"
+          ports:
+            - containerPort: 26257
+              name: sql
+            # - containerPort: 8080
+            #   name: http-ui
+          volumeMounts:
+            - name: db-requerimiento-storage
+              mountPath: /cockroach/cockroach-data
+          # readinessProbe:
+          #   httpGet:
+          #     path: /health?ready=1
+          #     port: 8080
+          #   initialDelaySeconds: 10
+          #   periodSeconds: 10
+          # livenessProbe:
+          #   httpGet:
+          #     path: /health
+          #     port: 8080
+          #   initialDelaySeconds: 20
+          #   periodSeconds: 15
+      volumes:
+        - name: db-requerimiento-storage
+          persistentVolumeClaim:
+            claimName: db-requerimiento-pvc
+      restartPolicy: Always

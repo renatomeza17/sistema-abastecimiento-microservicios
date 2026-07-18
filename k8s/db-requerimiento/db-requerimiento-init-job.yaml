@@ -1,0 +1,18 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: db-requerimiento-init
+spec:
+  template:
+    spec:
+      containers:
+        - name: db-requerimiento-init
+          image: cockroachdb/cockroach:v23.2.6
+          command:
+            - "/cockroach/cockroach"
+            - "sql"
+            - "--insecure"
+            - "--host=db-requerimiento:26257"
+            - "--execute=CREATE DATABASE IF NOT EXISTS requerimientodb;"
+      restartPolicy: OnFailure
+  backoffLimit: 5

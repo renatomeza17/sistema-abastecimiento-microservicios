@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: db-pedidodependencia
+  labels:
+    app: db-pedidodependencia
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: db-pedidodependencia
+  template:
+    metadata:
+      labels:
+        app: db-pedidodependencia
+    spec:
+      containers:
+        - name: db-pedidodependencia
+          image: cockroachdb/cockroach:v23.2.6
+          args:
+            - "start-single-node"
+            - "--insecure"
+            # - "--http-addr=:8080"
+            - "--listen-addr=:26257"
+          ports:
+            - containerPort: 26257
+              name: sql
+            # - containerPort: 8080
+            #   name: http-ui
+          volumeMounts:
+            - name: db-pedidodependencia-storage
+              mountPath: /cockroach/cockroach-data
+      volumes:
+        - name: db-pedidodependencia-storage
+          persistentVolumeClaim:
+            claimName: db-pedidodependencia-pvc
+      restartPolicy: Always
