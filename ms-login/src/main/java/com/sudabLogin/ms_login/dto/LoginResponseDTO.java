@@ -8,15 +8,17 @@ public class LoginResponseDTO {
     private String username;
     private String nombreCompleto;
     private List<String> roles;
+    private List<ModuloDTO> modulos;
 
     public LoginResponseDTO() {
     }
 
-    public LoginResponseDTO(String token, String username, String nombreCompleto, List<String> roles) {
+    public LoginResponseDTO(String token, String username, String nombreCompleto, List<String> roles, List<ModuloDTO> modulos) {
         this.token = token;
         this.username = username;
         this.nombreCompleto = nombreCompleto;
         this.roles = roles;
+        this.modulos = modulos;
     }
 
     public String getToken() {
@@ -50,6 +52,16 @@ public class LoginResponseDTO {
     public void setRoles(List<String> roles) {
         this.roles = roles;
     }
+
+    public List<ModuloDTO> getModulos() {
+        return modulos;
+    }
+
+    public void setModulos(List<ModuloDTO> modulos) {
+        this.modulos = modulos;
+    }
+
+    public record ModuloDTO(String descripcion, String url) {}
 
     @Override
     public String toString() {
