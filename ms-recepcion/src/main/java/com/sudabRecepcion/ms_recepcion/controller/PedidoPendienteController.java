@@ -8,15 +8,16 @@ import org.springframework.web.bind.annotation.*;
 import com.sudabRecepcion.ms_recepcion.http.response.PedidoPendienteResponseDTO;
 import com.sudabRecepcion.ms_recepcion.service.PedidoPendienteService;
 
-import lombok.RequiredArgsConstructor;
-
 @RestController
 @RequestMapping("/api/pedidos-pendientes")
-@RequiredArgsConstructor
 @CrossOrigin(origins = "*")
 public class PedidoPendienteController {
 
     private final PedidoPendienteService pedidoPendienteService;
+
+    public PedidoPendienteController(PedidoPendienteService pedidoPendienteService) {
+        this.pedidoPendienteService = pedidoPendienteService;
+    }
 
     @PostMapping
     public ResponseEntity<PedidoPendienteResponseDTO> registrar(

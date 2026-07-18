@@ -8,15 +8,16 @@ import com.sudabLogin.ms_login.dto.LoginRequestDTO;
 import com.sudabLogin.ms_login.dto.LoginResponseDTO;
 import com.sudabLogin.ms_login.service.AuthService;
 
-import lombok.RequiredArgsConstructor;
-
 @RestController
 @RequestMapping("/api/login")
 @CrossOrigin(origins = "*")
-@RequiredArgsConstructor
 public class AuthController {
 
     private final AuthService authService;
+
+    public AuthController(AuthService authService) {
+        this.authService = authService;
+    }
 
     // HU01 - Inicio de sesion
     @PostMapping

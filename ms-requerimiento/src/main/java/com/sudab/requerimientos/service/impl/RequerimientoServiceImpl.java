@@ -16,14 +16,12 @@ import com.sudab.requerimientos.repository.RequerimientoRepository;
 import com.sudab.requerimientos.service.CodigoGeneratorService;
 import com.sudab.requerimientos.service.RequerimientoService;
 import feign.FeignException;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Service
-@RequiredArgsConstructor
 @Transactional
 public class RequerimientoServiceImpl implements RequerimientoService {
 
@@ -33,6 +31,20 @@ public class RequerimientoServiceImpl implements RequerimientoService {
     private final UsuarioClient usuarioClient;
     private final DependenciaClient dependenciaClient;
     private final ProductoClient productoClient;
+
+    public RequerimientoServiceImpl(RequerimientoRepository requerimientoRepository,
+            RequerimientoMapper requerimientoMapper,
+            CodigoGeneratorService codigoGeneratorService,
+            UsuarioClient usuarioClient,
+            DependenciaClient dependenciaClient,
+            ProductoClient productoClient) {
+        this.requerimientoRepository = requerimientoRepository;
+        this.requerimientoMapper = requerimientoMapper;
+        this.codigoGeneratorService = codigoGeneratorService;
+        this.usuarioClient = usuarioClient;
+        this.dependenciaClient = dependenciaClient;
+        this.productoClient = productoClient;
+    }
 
     @Override
     public RequerimientoResponseDTO crear(RequerimientoRequestDTO dto) {

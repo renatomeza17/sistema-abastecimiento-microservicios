@@ -7,23 +7,21 @@ import com.sudab.requerimientos.dto.response.RequerimientoResponseDTO;
 import com.sudab.requerimientos.model.enums.EstadoRequerimiento;
 import com.sudab.requerimientos.service.RequerimientoService;
 import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-/**
- * Endpoints para la subpagina "Requerimientos": crear, listar, ver detalle
- * y cancelar.
- */
 @RestController
 @RequestMapping("/api/requerimientos")
-@RequiredArgsConstructor
 public class RequerimientoController {
 
     private final RequerimientoService requerimientoService;
+
+    public RequerimientoController(RequerimientoService requerimientoService) {
+        this.requerimientoService = requerimientoService;
+    }
 
     @PostMapping
     public ResponseEntity<RequerimientoResponseDTO> crear(@Valid @RequestBody RequerimientoRequestDTO dto) {

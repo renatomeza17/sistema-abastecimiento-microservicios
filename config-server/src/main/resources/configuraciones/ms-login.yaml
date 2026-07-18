@@ -6,9 +6,9 @@ spring:
     name: ms-login
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: ${SPRING_DATASOURCE_URL}
-    username: ${SPRING_DATASOURCE_USERNAME}
-    password: ${SPRING_DATASOURCE_PASSWORD}
+    url: jdbc:postgresql://postgres-login:5432/loginDb
+    username: postgres
+    password: postgres
   jpa:
     hibernate:
       ddl-auto: update

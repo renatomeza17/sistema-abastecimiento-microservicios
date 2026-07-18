@@ -56,9 +56,11 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleGeneral(Exception ex) {
+        ex.printStackTrace();
         ErrorResponse body = new ErrorResponse(
                 LocalDateTime.now(), HttpStatus.INTERNAL_SERVER_ERROR.value(),
-                "Error interno", "Ocurrio un error inesperado", List.of()
+                "Error interno", ex.getMessage() != null ? ex.getMessage() : ex.getClass().getSimpleName(),
+                List.of()
         );
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(body);
     }

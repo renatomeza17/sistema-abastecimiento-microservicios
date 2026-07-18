@@ -12,14 +12,17 @@ import com.sudabRecepcion.ms_recepcion.model.PedidoPendiente;
 import com.sudabRecepcion.ms_recepcion.repository.PedidoPendienteRepository;
 
 import feign.FeignException;
-import lombok.RequiredArgsConstructor;
 
 @Service
-@RequiredArgsConstructor
 public class PedidoPendienteService {
 
     private final PedidoPendienteRepository pedidoPendienteRepository;
     private final OrdenFeignClient ordenFeignClient;
+
+    public PedidoPendienteService(PedidoPendienteRepository pedidoPendienteRepository, OrdenFeignClient ordenFeignClient) {
+        this.pedidoPendienteRepository = pedidoPendienteRepository;
+        this.ordenFeignClient = ordenFeignClient;
+    }
 
     public PedidoPendienteResponseDTO registrar(Long idOrden, String motivo) {
         OrdenResponseDTO orden;

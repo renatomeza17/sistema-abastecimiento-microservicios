@@ -9,23 +9,23 @@ import com.sudab.requerimientos.model.enums.EstadoRequerimiento;
 import com.sudab.requerimientos.service.ProformaService;
 import com.sudab.requerimientos.service.RequerimientoService;
 import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-/**
- * Endpoints para la subpagina "Comparacion": listar requerimientos, ver el
- * detalle con sus proformas, y elegir la proforma ganadora.
- */
 @RestController
 @RequestMapping("/api/comparacion")
-@RequiredArgsConstructor
 public class ComparacionController {
 
     private final RequerimientoService requerimientoService;
     private final ProformaService proformaService;
+
+    public ComparacionController(RequerimientoService requerimientoService,
+            ProformaService proformaService) {
+        this.requerimientoService = requerimientoService;
+        this.proformaService = proformaService;
+    }
 
     @GetMapping("/requerimientos")
     public ResponseEntity<List<RequerimientoResponseDTO>> listarRequerimientos(

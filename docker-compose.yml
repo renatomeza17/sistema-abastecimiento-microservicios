@@ -1,179 +1,317 @@
-version: '3.8'
-
 services:
+  # ========== Databases ==========
+  postgres-login:
+    image: postgres:16-alpine
+    container_name: postgres-login
+    ports:
+      - "5433:5432"
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=loginDb
+    volumes:
+      - ./postgres-init/login/00-init.sql:/docker-entrypoint-initdb.d/00-init.sql
+      - ./db/Login/01.loginDb-schema.sql:/docker-entrypoint-initdb.d/01-schema.sql
+      - ./db/Login/02.loginDb-data.sql:/docker-entrypoint-initdb.d/02-data.sql
+      - pgdata-login:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d loginDb"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  postgres-recepcion:
+    image: postgres:16-alpine
+    container_name: postgres-recepcion
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=recepcionDb
+    volumes:
+      - ./postgres-init/recepcion/00-init.sql:/docker-entrypoint-initdb.d/00-init.sql
+      - ./db/Recepcion/01.recepcionDb-schema.sql:/docker-entrypoint-initdb.d/01-schema.sql
+      - ./db/Recepcion/02.recepcionDb-data.sql:/docker-entrypoint-initdb.d/02-data.sql
+      - pgdata-recepcion:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d recepcionDb"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  postgres-requerimiento:
+    image: postgres:16-alpine
+    container_name: postgres-requerimiento
+    ports:
+      - "5434:5432"
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=requerimientoDb
+    volumes:
+      - ./postgres-init/requerimiento/00-init.sql:/docker-entrypoint-initdb.d/00-init.sql
+      - ./db/Requerimiento/01.requerimientoDb-schema.sql:/docker-entrypoint-initdb.d/01-schema.sql
+      - ./db/Requerimiento/02.requerimientoDb-data.sql:/docker-entrypoint-initdb.d/02-data.sql
+      - pgdata-requerimiento:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d requerimientoDb"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  postgres-pedidodependencia:
+    image: postgres:16-alpine
+    container_name: postgres-pedidodependencia
+    ports:
+      - "5435:5432"
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=pedidoDb
+    volumes:
+      - ./postgres-init/pedidodependencia/00-init.sql:/docker-entrypoint-initdb.d/00-init.sql
+      - ./db/Pedidos/01.pedidoDb-schema.sql:/docker-entrypoint-initdb.d/01-schema.sql
+      - ./db/Pedidos/02.pedidoDb-data.sql:/docker-entrypoint-initdb.d/02-data.sql
+      - pgdata-pedidodependencia:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d pedidoDb"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  mysql-ordenes:
+    image: mysql:8.0
+    container_name: mysql-ordenes
+    ports:
+      - "3307:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_DATABASE=ordenesDb
+    volumes:
+      - ./db/Ordenes:/docker-entrypoint-initdb.d
+      - mysql-ordenes-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  mysql-kardex:
+    image: mysql:8.0
+    container_name: mysql-kardex
+    ports:
+      - "3308:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_DATABASE=kardexDb
+    volumes:
+      - ./db/Kardex:/docker-entrypoint-initdb.d
+      - mysql-kardex-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # ========== Infrastructure ==========
   config-server:
     build:
       context: .
       dockerfile: ./config-server/Dockerfile
+    image: config-server
     container_name: config-server
     ports:
       - "8888:8888"
+    depends_on:
+      - postgres-login
+      - postgres-recepcion
+      - postgres-requerimiento
+      - postgres-pedidodependencia
+      - mysql-ordenes
+      - mysql-kardex
     healthcheck:
-      test: ["CMD", "wget", "-q", "--spider", "http://localhost:8888"]
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8888/config-server/default || exit 1"]
       interval: 10s
       timeout: 5s
       retries: 10
-      start_period: 30s
-    networks:
-      - microservicios-proyecto_default
 
   eureka-server:
     build:
       context: .
       dockerfile: ./eureka-server/Dockerfile
+    image: eureka-server
     container_name: eureka-server
     ports:
       - "8761:8761"
+    environment:
+      - SPRING_CONFIG_IMPORT=optional:configserver:http://config-server:8888
     depends_on:
       config-server:
         condition: service_healthy
     healthcheck:
-      test: ["CMD", "wget", "-q", "--spider", "http://localhost:8761/actuator/health"]
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:8761/actuator/health || exit 1"]
       interval: 10s
       timeout: 5s
       retries: 10
-      start_period: 30s
-    networks:
-      - microservicios-proyecto_default
 
-  ms-gateway:
+  # ========== Microservices ==========
+  ms-login:
     build:
       context: .
-      dockerfile: ./ms-gateway/Dockerfile
-    container_name: ms-gateway
+      dockerfile: ./ms-login/Dockerfile
+    image: ms-login
+    container_name: ms-login
     ports:
-      - "8080:8080"
-    depends_on:
-      eureka-server:
-        condition: service_healthy
-    networks:
-      - microservicios-proyecto_default
-
-  ms-ordenes:
-    build:
-      context: .
-      dockerfile: ./ms-ordenes/Dockerfile
-    container_name: ms-ordenes
-    ports:
-      - "8082:8082"
+      - "8086:8086"
     environment:
-      SPRING_DATASOURCE_URL: ${ORDENES_DB_URL}
-      SPRING_DATASOURCE_USERNAME: ${ORDENES_DB_USERNAME}
-      SPRING_DATASOURCE_PASSWORD: ${ORDENES_DB_PASSWORD}
-      TOKEN_JWT_SECRET: ${TOKEN_JWT_SECRET}
-
+      - SPRING_CONFIG_IMPORT=optional:configserver:http://config-server:8888
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres-login:5432/loginDb
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=postgres
+      - TOKEN_JWT_SECRET=clave-super-secreta-sudab-2024-abastecimiento
     depends_on:
+      postgres-login:
+        condition: service_healthy
+      config-server:
+        condition: service_healthy
       eureka-server:
         condition: service_healthy
-    networks:
-      - microservicios-proyecto_default
-
-  ms-requerimiento:
-    build:
-      context: .
-      dockerfile: ./ms-requerimiento/Dockerfile
-    container_name: ms-requerimiento
-    ports:
-      - "8083:8083"
-    depends_on:
-      eureka-server:
-        condition: service_healthy
-    networks:
-      - microservicios-proyecto_default
-
-  ms-pedidodependencia:
-    build:
-      context: .
-      dockerfile: ./ms-pedidodependencia/Dockerfile
-    container_name: ms-pedidodependencia
-    ports:
-      - "8084:8084"
-    depends_on:
-      eureka-server:
-        condition: service_healthy
-    networks:
-      - microservicios-proyecto_default
-
-  postgres-recepcion:
-    image: postgres:16-alpine
-    container_name: postgres-recepcion
-    environment:
-      POSTGRES_DB: recepcionDb
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-    ports:
-      - "5432:5432"
-    volumes:
-      - ./db/Recepcion:/docker-entrypoint-initdb.d
-      - postgres-recepcion-data:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
-    networks:
-      - microservicios-proyecto_default
 
   ms-recepcion:
     build:
       context: .
       dockerfile: ./ms-recepcion/Dockerfile
+    image: ms-recepcion
     container_name: ms-recepcion
     ports:
       - "8085:8085"
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://ep-divine-bonus-acdcecau-pooler.sa-east-1.aws.neon.tech/recepciondb?sslmode=require&channel_binding=require
-      SPRING_DATASOURCE_USERNAME: neondb_owner
-      SPRING_DATASOURCE_PASSWORD: npg_b2rmGo7zMJYB
-      TOKEN_JWT_SECRET: clave-super-secreta-sudab-2024-abastecimiento
+      - SPRING_CONFIG_IMPORT=optional:configserver:http://config-server:8888
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres-recepcion:5432/recepcionDb
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=postgres
+      - TOKEN_JWT_SECRET=clave-super-secreta-sudab-2024-abastecimiento
     depends_on:
-      eureka-server:
-        condition: service_healthy
       postgres-recepcion:
         condition: service_healthy
-    networks:
-      - microservicios-proyecto_default
+      config-server:
+        condition: service_healthy
+      eureka-server:
+        condition: service_healthy
 
+  ms-ordenes:
+    build:
+      context: .
+      dockerfile: ./ms-ordenes/Dockerfile
+    image: ms-ordenes
+    container_name: ms-ordenes
+    ports:
+      - "8082:8082"
+    environment:
+      - SPRING_CONFIG_IMPORT=optional:configserver:http://config-server:8888
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka
+      - ORDENES_DB_URL=jdbc:mysql://mysql-ordenes:3306/ordenesDb
+      - ORDENES_DB_USERNAME=root
+      - ORDENES_DB_PASSWORD=root
+      - TOKEN_JWT_SECRET=clave-super-secreta-sudab-2024-abastecimiento
+    depends_on:
+      mysql-ordenes:
+        condition: service_healthy
+      config-server:
+        condition: service_healthy
+      eureka-server:
+        condition: service_healthy
+
+  ms-requerimiento:
+    build:
+      context: .
+      dockerfile: ./ms-requerimiento/Dockerfile
+    image: ms-requerimiento
+    container_name: ms-requerimiento
+    ports:
+      - "8083:8083"
+    environment:
+      - SPRING_CONFIG_IMPORT=optional:configserver:http://config-server:8888
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres-requerimiento:5432/requerimientoDb
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=postgres
+    depends_on:
+      postgres-requerimiento:
+        condition: service_healthy
+      config-server:
+        condition: service_healthy
+      eureka-server:
+        condition: service_healthy
+
+  ms-pedidodependencia:
+    build:
+      context: .
+      dockerfile: ./ms-pedidodependencia/Dockerfile
+    image: ms-pedidodependencia
+    container_name: ms-pedidodependencia
+    ports:
+      - "8084:8084"
+    environment:
+      - SPRING_CONFIG_IMPORT=optional:configserver:http://config-server:8888
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres-pedidodependencia:5432/pedidoDb
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=postgres
+    depends_on:
+      postgres-pedidodependencia:
+        condition: service_healthy
+      config-server:
+        condition: service_healthy
+      eureka-server:
+        condition: service_healthy
 
   ms-kardex:
     build:
       context: .
       dockerfile: ./ms-kardex/Dockerfile
+    image: ms-kardex
     container_name: ms-kardex
     ports:
       - "8087:8087"
     environment:
-      SPRING_DATASOURCE_URL: ${KARDEX_DB_URL}
-      SPRING_DATASOURCE_USERNAME: ${KARDEX_DB_USERNAME}
-      SPRING_DATASOURCE_PASSWORD: ${KARDEX_DB_PASSWORD}
-      TOKEN_JWT_SECRET: ${TOKEN_JWT_SECRET}
+      - SPRING_CONFIG_IMPORT=optional:configserver:http://config-server:8888
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka
+      - KARDEX_DB_URL=jdbc:mysql://mysql-kardex:3306/kardexDb
+      - KARDEX_DB_USERNAME=root
+      - KARDEX_DB_PASSWORD=root
+      - TOKEN_JWT_SECRET=clave-super-secreta-sudab-2024-abastecimiento
     depends_on:
+      mysql-kardex:
+        condition: service_healthy
+      config-server:
+        condition: service_healthy
       eureka-server:
         condition: service_healthy
-    networks:
-      - microservicios-proyecto_default
 
-  ms-login:
+  ms-gateway:
     build:
       context: .
-      dockerfile: ./ms-login/Dockerfile
-    container_name: ms-login
+      dockerfile: ./ms-gateway/Dockerfile
+    image: ms-gateway
+    container_name: ms-gateway
     ports:
-      - "8086:8086"
+      - "8080:8080"
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://ep-divine-bonus-acdcecau-pooler.sa-east-1.aws.neon.tech/logindb?sslmode=require&channel_binding=require
-      SPRING_DATASOURCE_USERNAME: neondb_owner
-      SPRING_DATASOURCE_PASSWORD: npg_b2rmGo7zMJYB
-      TOKEN_JWT_SECRET: clave-super-secreta-sudab-2024-abastecimiento
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka
     depends_on:
+      config-server:
+        condition: service_healthy
       eureka-server:
         condition: service_healthy
-    networks:
-      - microservicios-proyecto_default
 
 volumes:
-  postgres-recepcion-data:
-
-networks:
-  microservicios-proyecto_default:
-    external: true
+  pgdata-login:
+  pgdata-recepcion:
+  pgdata-requerimiento:
+  pgdata-pedidodependencia:
+  mysql-ordenes-data:
+  mysql-kardex-data:

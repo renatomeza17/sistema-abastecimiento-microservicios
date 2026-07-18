@@ -9,18 +9,26 @@ import com.sudabLogin.ms_login.config.JwtUtil;
 import com.sudabLogin.ms_login.dto.LoginRequestDTO;
 import com.sudabLogin.ms_login.dto.LoginResponseDTO;
 import com.sudabLogin.ms_login.model.Rol;
+import com.sudabLogin.ms_login.model.RolModulo;
 import com.sudabLogin.ms_login.model.Usuario;
+import com.sudabLogin.ms_login.dto.LoginResponseDTO.ModuloDTO;
+import com.sudabLogin.ms_login.repository.RolModuloRepository;
 import com.sudabLogin.ms_login.repository.UsuarioRepository;
 
-import lombok.RequiredArgsConstructor;
-
 @Service
-@RequiredArgsConstructor
 public class AuthService {
 
     private final UsuarioRepository usuarioRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
+    private final RolModuloRepository rolModuloRepository;
+
+    public AuthService(UsuarioRepository usuarioRepository, PasswordEncoder passwordEncoder, JwtUtil jwtUtil, RolModuloRepository rolModuloRepository) {
+        this.usuarioRepository = usuarioRepository;
+        this.passwordEncoder = passwordEncoder;
+        this.jwtUtil = jwtUtil;
+        this.rolModuloRepository = rolModuloRepository;
+    }
 
     public LoginResponseDTO login(LoginRequestDTO request) {
         Usuario usuario = usuarioRepository.findByUsername(request.getUsername())
@@ -37,9 +45,14 @@ public class AuthService {
 
         String token = jwtUtil.generarToken(usuario.getUsername(), nombresRoles);
 
-        // Los datos de persona ahora viven directamente en Usuario (ya no hay entidad Persona separada)
         String nombreCompleto = usuario.getNombres() + " " + usuario.getApellidoPaterno();
 
-        return new LoginResponseDTO(token, usuario.getUsername(), nombreCompleto, nombresRoles);
+        List<ModuloDTO> modulos = usuario.getRoles().stream()
+                .flatMap(rol -> rolModuloRepository.findByRol_IdRol(rol.getIdRol()).stream())
+                .map(rm -> new ModuloDTO(rm.getModulo().getDescripcion(), rm.getModulo().getUrl()))
+                .distinct()
+                .toList();
+
+        return new LoginResponseDTO(token, usuario.getUsername(), nombreCompleto, nombresRoles, modulos);
     }
 }

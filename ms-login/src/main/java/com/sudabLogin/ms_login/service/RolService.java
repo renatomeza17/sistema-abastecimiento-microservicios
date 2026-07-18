@@ -8,14 +8,16 @@ import com.sudabLogin.ms_login.model.Usuario;
 import com.sudabLogin.ms_login.repository.RolRepository;
 import com.sudabLogin.ms_login.repository.UsuarioRepository;
 
-import lombok.RequiredArgsConstructor;
-
 @Service
-@RequiredArgsConstructor
 public class RolService {
 
     private final UsuarioRepository usuarioRepository;
     private final RolRepository rolRepository;
+
+    public RolService(UsuarioRepository usuarioRepository, RolRepository rolRepository) {
+        this.usuarioRepository = usuarioRepository;
+        this.rolRepository = rolRepository;
+    }
 
     public Usuario asignarRol(AsignarRolDTO request) {
         Usuario usuario = usuarioRepository.findById(request.getIdUsuario())

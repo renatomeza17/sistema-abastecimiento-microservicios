@@ -5,7 +5,6 @@ import com.sudab.pedidodependencia.dto.response.PedidoDependenciaResponseDTO;
 import com.sudab.pedidodependencia.model.enums.EstadoPedidoDependencia;
 import com.sudab.pedidodependencia.service.PedidoDependenciaService;
 import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -13,15 +12,14 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.UUID;
 
-/**
- * Endpoints para la (unica, por ahora) subpagina de Pedido de dependencia:
- * crear un pedido y ver los pedidos asociados al usuario logueado.
- */
 @RestController
-@RequiredArgsConstructor
 public class PedidoDependenciaController {
 
     private final PedidoDependenciaService pedidoDependenciaService;
+
+    public PedidoDependenciaController(PedidoDependenciaService pedidoDependenciaService) {
+        this.pedidoDependenciaService = pedidoDependenciaService;
+    }
 
     @PostMapping("/api/pedidos-dependencia")
     public ResponseEntity<PedidoDependenciaResponseDTO> crear(
@@ -30,7 +28,6 @@ public class PedidoDependenciaController {
         return ResponseEntity.status(HttpStatus.CREATED).body(creado);
     }
 
-    // Listar los pedidos asociados al usuario (jefe de dependencia) logueado
     @GetMapping("/api/usuarios/{idUsuario}/pedidos-dependencia")
     public ResponseEntity<List<PedidoDependenciaResponseDTO>> listarPorUsuario(
             @PathVariable Long idUsuario,

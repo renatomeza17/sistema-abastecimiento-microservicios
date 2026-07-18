@@ -19,14 +19,12 @@ import com.sudab.requerimientos.repository.RequerimientoRepository;
 import com.sudab.requerimientos.service.CodigoGeneratorService;
 import com.sudab.requerimientos.service.ProformaService;
 import feign.FeignException;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Service
-@RequiredArgsConstructor
 @Transactional
 public class ProformaServiceImpl implements ProformaService {
 
@@ -36,6 +34,20 @@ public class ProformaServiceImpl implements ProformaService {
     private final CodigoGeneratorService codigoGeneratorService;
     private final UsuarioClient usuarioClient;
     private final ProductoClient productoClient;
+
+    public ProformaServiceImpl(ProformaRepository proformaRepository,
+            RequerimientoRepository requerimientoRepository,
+            ProformaMapper proformaMapper,
+            CodigoGeneratorService codigoGeneratorService,
+            UsuarioClient usuarioClient,
+            ProductoClient productoClient) {
+        this.proformaRepository = proformaRepository;
+        this.requerimientoRepository = requerimientoRepository;
+        this.proformaMapper = proformaMapper;
+        this.codigoGeneratorService = codigoGeneratorService;
+        this.usuarioClient = usuarioClient;
+        this.productoClient = productoClient;
+    }
 
     @Override
     public ProformaResponseDTO cotizar(UUID idRequerimiento, ProformaRequestDTO dto) {

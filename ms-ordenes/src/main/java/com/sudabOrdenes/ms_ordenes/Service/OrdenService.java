@@ -30,12 +30,7 @@ import jakarta.persistence.EntityNotFoundException;
 import org.springframework.transaction.annotation.Transactional;
 
 
-import lombok.RequiredArgsConstructor;
-
-
 @Service
-@RequiredArgsConstructor
-
 public class OrdenService {
 
     
@@ -45,6 +40,12 @@ public class OrdenService {
     private final ProformaClient proformaClient;
    
     private final KardexClient kardexClient;
+
+    public OrdenService(OrdenCompraRepository ordenCompraRepository, ProformaClient proformaClient, KardexClient kardexClient) {
+        this.ordenCompraRepository = ordenCompraRepository;
+        this.proformaClient = proformaClient;
+        this.kardexClient = kardexClient;
+    }
     
 
 
@@ -153,7 +154,6 @@ public class OrdenService {
         OrdenCompra ordenEnviada = ordenCompraRepository.save(orden);
         return convertirAConvertirDTO(ordenEnviada);
     }   
-
 
 
 

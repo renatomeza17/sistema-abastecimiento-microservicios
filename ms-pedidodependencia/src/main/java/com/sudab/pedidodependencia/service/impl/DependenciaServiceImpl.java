@@ -8,7 +8,6 @@ import com.sudab.pedidodependencia.mapper.DependenciaMapper;
 import com.sudab.pedidodependencia.model.Dependencia;
 import com.sudab.pedidodependencia.repository.DependenciaRepository;
 import com.sudab.pedidodependencia.service.DependenciaService;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,12 +15,17 @@ import java.util.List;
 import java.util.UUID;
 
 @Service
-@RequiredArgsConstructor
 @Transactional
 public class DependenciaServiceImpl implements DependenciaService {
 
     private final DependenciaRepository dependenciaRepository;
     private final DependenciaMapper dependenciaMapper;
+
+    public DependenciaServiceImpl(DependenciaRepository dependenciaRepository,
+            DependenciaMapper dependenciaMapper) {
+        this.dependenciaRepository = dependenciaRepository;
+        this.dependenciaMapper = dependenciaMapper;
+    }
 
     @Override
     public DependenciaResponseDTO crear(DependenciaRequestDTO dto) {

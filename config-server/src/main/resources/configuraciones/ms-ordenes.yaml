@@ -7,9 +7,9 @@ spring:
   
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: ${ORDENES_DB_URL}
-    username: ${ORDENES_DB_USERNAME}
-    password: ${ORDENES_DB_PASSWORD}
+    url: jdbc:mysql://mysql-ordenes:3306/ordenesDb
+    username: root
+    password: root
     hikari:
       maximum-pool-size: 2  
       minimum-idle: 1
@@ -20,7 +20,6 @@ spring:
     show-sql: true
     hibernate:
       ddl-auto: update
-      
 
 springdoc:
   swagger-ui:

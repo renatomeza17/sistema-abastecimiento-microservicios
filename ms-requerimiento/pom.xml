@@ -1,22 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--
-  NOTA: este pom.xml esta armado como proyecto standalone para que puedas
-  compilarlo y probarlo de forma aislada. Cuando lo muevas dentro de
-  ms-requerimiento en el repo del equipo, reemplaza el <parent> por el
-  modulo padre real del proyecto (el que ya trae spring-boot-starter-parent
-  y, si aplica, el BOM de spring-cloud-dependencies) para no duplicar
-  versiones. Ajusta groupId/artifactId a como los tenga definidos ese pom.
--->
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.3.4</version>
-        <relativePath/>
+        <groupId>com.sudabContainer</groupId>
+        <artifactId>sudab-container</artifactId>
+        <version>1.0-SNAPSHOT</version>
     </parent>
 
     <groupId>com.sudab</groupId>
@@ -27,7 +18,7 @@
 
     <properties>
         <java.version>21</java.version>
-        <spring-cloud.version>2023.0.3</spring-cloud.version>
+        <spring-cloud.version>2025.1.2</spring-cloud.version>
     </properties>
 
     <dependencyManagement>
@@ -60,7 +51,6 @@
             <artifactId>spring-boot-starter-actuator</artifactId>
         </dependency>
 
-        <!-- Ecosistema Spring Cloud del proyecto: descubrimiento y config centralizada -->
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
@@ -74,7 +64,6 @@
             <artifactId>spring-cloud-starter-openfeign</artifactId>
         </dependency>
 
-        <!-- Reintentos ante errores serializables (40001) de CockroachDB -->
         <dependency>
             <groupId>org.springframework.retry</groupId>
             <artifactId>spring-retry</artifactId>
@@ -84,23 +73,23 @@
             <artifactId>spring-aspects</artifactId>
         </dependency>
 
-        <!-- CockroachDB habla el protocolo de PostgreSQL -->
         <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
             <scope>runtime</scope>
         </dependency>
 
-        <!-- Migraciones versionadas del esquema -->
         <dependency>
             <groupId>org.flywaydb</groupId>
             <artifactId>flyway-database-postgresql</artifactId>
         </dependency>
 
+        <!-- Source: https://mvnrepository.com/artifact/org.springdoc/springdoc-openapi-starter-webmvc-ui -->
         <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-            <optional>true</optional>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+            <version>3.0.3</version>
+            <scope>compile</scope>
         </dependency>
 
         <dependency>
@@ -111,19 +100,10 @@
     </dependencies>
 
     <build>
-        <finalName>requerimientos-proformas-service</finalName>
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
-                <configuration>
-                    <excludes>
-                        <exclude>
-                            <groupId>org.projectlombok</groupId>
-                            <artifactId>lombok</artifactId>
-                        </exclude>
-                    </excludes>
-                </configuration>
             </plugin>
         </plugins>
     </build>
